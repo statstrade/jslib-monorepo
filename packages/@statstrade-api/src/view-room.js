@@ -1,0 +1,535 @@
+const ut = require("@xtalk/db/base-util")
+
+// statsapi.list.view-room/room-by-official-all [14] 
+var room_by_official_all = {
+  "input":[],
+  "return":"jsonb",
+  "schema":"core/query-room",
+  "id":"room_by_official_all",
+  "flags":{"super":true},
+  "view":{
+    "table":"Room",
+    "type":"select",
+    "tag":"by_official_all",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"__deleted__":false,"is_official":true},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-room/room-by-super-all [14] 
+var room_by_super_all = {
+  "input":[
+    {"symbol":"i_types","type":"jsonb"},
+    {"symbol":"i_statuses","type":"jsonb"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-room",
+  "id":"room_by_super_all",
+  "flags":{"super":true},
+  "view":{
+    "table":"Room",
+    "type":"select",
+    "tag":"by_super_all",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "type":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_types}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application-room",
+            "name":"EnumRoomType"
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "status":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_statuses}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application-room",
+            "name":"EnumRoomStatus"
+          }
+          ]
+        }
+        ]
+      }
+      ]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-room/room-by-organisation-admin [14] 
+var room_by_organisation_admin = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_organisation_ids","type":"jsonb"},
+    {"symbol":"i_types","type":"jsonb"},
+    {"symbol":"i_statuses","type":"jsonb"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-room",
+  "id":"room_by_organisation_admin",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Room",
+    "type":"select",
+    "tag":"by_organisation_admin",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "__deleted__":false,
+      "type":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_types}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application-room",
+            "name":"EnumRoomType"
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "status":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_statuses}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application-room",
+            "name":"EnumRoomStatus"
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "organisation":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/fn",
+          "name":"uuid",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_organisation_ids}}"}]
+          }
+          ]
+        }
+        ]
+      }
+      ]
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_organisation_ids","type":"jsonb"}
+        ],
+        "return":"jsonb",
+        "schema":"core/account-organisation",
+        "id":"assert_is_admin_bulk",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_organisation_ids}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-room/room-by-organisation-public [14] 
+var room_by_organisation_public = {
+  "input":[
+    {"symbol":"i_organisation_ids","type":"jsonb"},
+    {"symbol":"i_types","type":"jsonb"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-room",
+  "id":"room_by_organisation_public",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Room",
+    "type":"select",
+    "tag":"by_organisation_public",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "policy":"public",
+      "status":"active",
+      "organisation":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/fn",
+          "name":"uuid",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_organisation_ids}}"}]
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "type":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_types}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application-room",
+            "name":"EnumRoomType"
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "playable":{"evm_vaults":["is_not_null"]}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-room/room-by-public-official [14] 
+var room_by_public_official = {
+  "input":[],
+  "return":"jsonb",
+  "schema":"core/query-room",
+  "id":"room_by_public_official",
+  "flags":{"public":true},
+  "view":{
+    "table":"Room",
+    "type":"select",
+    "tag":"by_public_official",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"policy":"public","is_official":true},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-room/room-by-public-all [14] 
+var room_by_public_all = {
+  "input":[{"symbol":"i_types","type":"jsonb"}],
+  "return":"jsonb",
+  "schema":"core/query-room",
+  "id":"room_by_public_all",
+  "flags":{"public":true},
+  "view":{
+    "table":"Room",
+    "type":"select",
+    "tag":"by_public_all",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "policy":"public",
+      "type":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_types}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application-room",
+            "name":"EnumRoomType"
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "status":"active",
+      "playable":{"evm_vaults":["is_not_null"]}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-room/room-by-public-name [14] 
+var room_by_public_name = {
+  "input":[
+    {"symbol":"i_name","type":"citext"},
+    {"symbol":"i_types","type":"jsonb"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-room",
+  "id":"room_by_public_name",
+  "flags":{"public":true},
+  "view":{
+    "table":"Room",
+    "type":"select",
+    "tag":"by_public_name",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "name":"{{i_name}}",
+      "policy":"public",
+      "type":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_types}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application-room",
+            "name":"EnumRoomType"
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "status":"active",
+      "playable":{"evm_vaults":["is_not_null"]}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-room/room-by-id-admin [14] 
+var room_by_id_admin = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_room_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-room",
+  "id":"room_by_id_admin",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Room",
+    "type":"select",
+    "tag":"by_id_admin",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"id":"{{i_room_id}}"},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-room/room-default [19] 
+var room_default = {
+  "input":[{"symbol":"i_room_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-room",
+  "id":"room_default",
+  "flags":{},
+  "view":{
+    "table":"Room",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-room/room-view-default [19] 
+var room_view_default = {
+  "input":[{"symbol":"i_room_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-room",
+  "id":"room_view_default",
+  "flags":{},
+  "view":{
+    "table":"Room",
+    "type":"return",
+    "tag":"view_default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      [
+      "playable",
+      [
+      [
+      "evm_vaults",
+      [
+      ["currency",["*/standard"]],
+      ["tx_create",["*/standard"]],
+      "*/standard"
+    ]
+    ],
+      "*/standard",
+      ["gas_asset",[["currency",["*/standard"]],"*/standard"]],
+      ["summary",["*/standard"]]
+    ]
+    ],
+      "*/standard"
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-room/room-view-membership [19] 
+var room_view_membership = {
+  "input":[{"symbol":"i_room_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-room",
+  "id":"room_view_membership",
+  "flags":{},
+  "view":{
+    "table":"Room",
+    "type":"return",
+    "tag":"view_membership",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      [
+      "playable",
+      [
+      [
+      "evm_vaults",
+      [
+      ["currency",["*/standard"]],
+      ["tx_create",["*/standard"]],
+      "*/standard"
+    ]
+    ],
+      "*/standard",
+      ["gas_asset",[["currency",["*/standard"]],"*/standard"]],
+      ["summary",["*/standard"]]
+    ]
+    ],
+      [
+      "access",
+      [
+      "*/standard",
+      [
+      "entries",
+      [
+      "*/standard",
+      [
+      "account",
+      [
+      ["profile",["last_name","first_name","id","picture"]],
+      "nickname",
+      "id"
+    ]
+    ]
+    ]
+    ]
+    ]
+    ],
+      "*/standard"
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-room/make-views [22] 
+function make_views(){
+  return ut.collect_views([
+    room_by_official_all,
+    room_by_super_all,
+    room_by_organisation_admin,
+    room_by_organisation_public,
+    room_by_public_official,
+    room_by_public_all,
+    room_by_public_name,
+    room_by_id_admin,
+    room_default,
+    room_view_default,
+    room_view_membership
+  ]);
+}
+
+var MODULE = {
+  "room_by_official_all":room_by_official_all,
+  "room_by_super_all":room_by_super_all,
+  "room_by_organisation_admin":room_by_organisation_admin,
+  "room_by_organisation_public":room_by_organisation_public,
+  "room_by_public_official":room_by_public_official,
+  "room_by_public_all":room_by_public_all,
+  "room_by_public_name":room_by_public_name,
+  "room_by_id_admin":room_by_id_admin,
+  "room_default":room_default,
+  "room_view_default":room_view_default,
+  "room_view_membership":room_view_membership,
+  "make_views":make_views
+};
+
+module.exports = MODULE

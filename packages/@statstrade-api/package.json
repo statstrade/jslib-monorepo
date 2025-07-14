@@ -1,0 +1,60 @@
+{
+  "name": "@statstrade/api",
+  "version": "0.0.6",
+  "private": false,
+  "exports": {
+      "./db-global": "./src/db-global.js",
+      "./db-schema-full": "./src/db-schema-full.js",
+      "./db-view-cache": "./src/db-view-cache.js",
+      "./db-view-sql": "./src/db-view-sql.js",
+      "./db-view": "./src/db-view.js",
+      "./fn-account": "./src/fn-account.js",
+      "./fn-brand": "./src/fn-brand.js",
+      "./fn-ethereum": "./src/fn-ethereum.js",
+      "./fn-extern": "./src/fn-extern.js",
+      "./fn-organisation": "./src/fn-organisation.js",
+      "./fn-prediction": "./src/fn-prediction.js",
+      "./fn-room": "./src/fn-room.js",
+      "./fn-super": "./src/fn-super.js",
+      "./fn-swap": "./src/fn-swap.js",
+      "./fn-topic": "./src/fn-topic.js",
+      "./fn-wallet": "./src/fn-wallet.js",
+      "./net-account": ".src/net-account.js",
+      "./net-general": ".src/net-general.js",
+      "./net-image": ".src/net-image.js",
+      "./net-manage": ".src/net-manage.js",
+      "./net-social": ".src/net-social.js",
+      "./net-stream": ".src/net-stream.js",
+      "./net-trade": ".src/net-trade.js",
+      "./net-web3": ".src/net-web3.js",
+      "./net-account": "./src/net-account.js",
+      "./net-general": "./src/net-general.js",
+      "./net-image": "./src/net-image.js",
+      "./net-manage": "./src/net-manage.js",
+      "./net-social": "./src/net-social.js",
+      "./net-stream": "./src/net-stream.js",
+      "./net-trade": "./src/net-trade.js",
+      "./net-web3": "./src/net-web3.js",
+      "./view-all": "./src/view-all.js",
+      "./view-blockchain": "./src/view-blockchain.js",
+      "./view-brand": "./src/view-brand.js",
+      "./view-extern": "./src/view-extern.js",
+      "./view-harness": "./src/view-harness.js",
+      "./view-room": "./src/view-room.js",
+      "./view-super": "./src/view-super.js",
+      "./view-support": "./src/view-support.js",
+      "./view-swap": "./src/view-swap.js",
+      "./view-topic": "./src/view-topic.js",
+      "./view-user": "./src/view-user.js"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  },
+  "dependencies": {
+    "@xtalk/lang": "*",
+    "@xtalk/db": "*"
+  }
+}

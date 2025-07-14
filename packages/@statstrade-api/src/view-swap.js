@@ -1,0 +1,1433 @@
+const ut = require("@xtalk/db/base-util")
+
+// statsapi.list.view-swap/swap-by-id-admin [15] 
+var swap_by_id_admin = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_swap_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_by_id_admin",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Swap",
+    "type":"select",
+    "tag":"by_id_admin",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"id":"{{i_swap_id}}"},
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_swap_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"swap/data-swap",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_swap_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-by-organisation-admin [15] 
+var swap_by_organisation_admin = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_organisation_ids","type":"jsonb"},
+    {"symbol":"i_statuses","type":"jsonb"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_by_organisation_admin",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Swap",
+    "type":"select",
+    "tag":"by_organisation_admin",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "__deleted__":false,
+      "status":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_statuses}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application-swap",
+            "name":"EnumSwapStatus"
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "organisation":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/fn",
+          "name":"uuid",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_organisation_ids}}"}]
+          }
+          ]
+        }
+        ]
+      }
+      ]
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_organisation_ids","type":"jsonb"}
+        ],
+        "return":"jsonb",
+        "schema":"core/account-organisation",
+        "id":"assert_is_admin_bulk",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_organisation_ids}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-by-organisation-public [15] 
+var swap_by_organisation_public = {
+  "input":[{"symbol":"i_organisation_ids","type":"jsonb"}],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_by_organisation_public",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Swap",
+    "type":"select",
+    "tag":"by_organisation_public",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "status":["in",[["started","paused","stopped"]]],
+      "organisation":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/fn",
+          "name":"uuid",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_organisation_ids}}"}]
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "playable_primary":{"rooms":{"status":"active"}},
+      "playable_secondary":{"rooms":{"status":"active"}}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-by-super-all [15] 
+var swap_by_super_all = {
+  "input":[{"symbol":"i_statuses","type":"jsonb"}],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_by_super_all",
+  "flags":{"super":true},
+  "view":{
+    "table":"Swap",
+    "type":"select",
+    "tag":"by_super_all",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "status":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_statuses}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application-swap",
+            "name":"EnumSwapStatus"
+          }
+          ]
+        }
+        ]
+      }
+      ]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-by-public-all [15] 
+var swap_by_public_all = {
+  "input":[],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_by_public_all",
+  "flags":{"public":true},
+  "view":{
+    "table":"Swap",
+    "type":"select",
+    "tag":"by_public_all",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "status":["in",[["started","paused","stopped"]]],
+      "playable_primary":{"rooms":{"status":"active"}},
+      "playable_secondary":{"rooms":{"status":"active"}}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-by-public-code [15] 
+var swap_by_public_code = {
+  "input":[{"symbol":"i_code","type":"citext"}],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_by_public_code",
+  "flags":{"public":true},
+  "view":{
+    "table":"Swap",
+    "type":"select",
+    "tag":"by_public_code",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "code":"{{i_code}}",
+      "status":["in",[["started","paused","stopped"]]],
+      "playable_primary":{"rooms":{"status":"active"}},
+      "playable_secondary":{"rooms":{"status":"active"}}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-active-book [15] 
+var swap_active_book = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_book_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_active_book",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Swap",
+    "type":"select",
+    "tag":"active_book",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "status":["in",[["started","paused","stopped"]]],
+      "book":"{{i_book_id}}"
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-get-public-code [15] 
+var swap_get_public_code = {
+  "input":[{"symbol":"i_swap_code","type":"citext"}],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_get_public_code",
+  "flags":{"public":true},
+  "view":{
+    "table":"Swap",
+    "type":"select",
+    "tag":"get_public_code",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "code":"{{i_swap_code}}",
+      "status":["in",[["started","paused","stopped"]]]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-all-public [15] 
+var swap_all_public = {
+  "input":[],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_all_public",
+  "flags":{"public":true},
+  "view":{
+    "table":"Swap",
+    "type":"select",
+    "tag":"all_public",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"status":["in",[["started","paused","stopped"]]]},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-log-summary-by-swap [15] 
+var swap_order_log_summary_by_swap = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_swap_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_log_summary_by_swap",
+  "flags":{"personal":true},
+  "view":{
+    "table":"SwapOrderLogSummary",
+    "type":"select",
+    "tag":"by_swap",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"book":{"swaps":"{{i_swap_id}}"}},
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_swap_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"swap/data-swap",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_swap_id}}"]
+    }
+    ],
+    "autos":[
+      {
+      "function":{
+        "input":[{"symbol":"i_swap_id","type":"uuid"}],
+        "return":"jsonb",
+        "schema":"core/query-swap",
+        "id":"update_swap_order_log_summary",
+        "flags":{}
+      },
+      "args":["{{i_swap_id}}"]
+    }
+    ]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-active [15] 
+var swap_order_active = {
+  "input":[{"symbol":"i_account_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_active",
+  "flags":{"personal":true},
+  "view":{
+    "table":"SwapOrder",
+    "type":"select",
+    "tag":"active",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"account":"{{i_account_id}}","status":"active"},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-active-book [15] 
+var swap_order_active_book = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_book_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_active_book",
+  "flags":{"personal":true},
+  "view":{
+    "table":"SwapOrder",
+    "type":"select",
+    "tag":"active_book",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "account":"{{i_account_id}}",
+      "status":"active",
+      "book":"{{i_book_id}}"
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/tx-swap-order-for [15] 
+var tx_swap_order_for = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_swap_order_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"tx_swap_order_for",
+  "flags":{"personal":true},
+  "view":{
+    "table":"TxSwapOrder",
+    "type":"select",
+    "tag":"for",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "order":{"id":"{{i_swap_order_id}}","account":"{{i_account_id}}"}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/tx-swap-order-for-swap [15] 
+var tx_swap_order_for_swap = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_swap_id","type":"uuid"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"tx_swap_order_for_swap",
+  "flags":{"personal":true},
+  "view":{
+    "table":"TxSwapOrder",
+    "type":"select",
+    "tag":"for_swap",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "order":{
+        "book":{"swaps":"{{i_swap_id}}"},
+        "account":"{{i_account_id}}"
+      },
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-by-published [15] 
+var swap_order_by_published = {
+  "input":[
+    {"symbol":"i_swap_id","type":"uuid"},
+    {"symbol":"i_status","type":"jsonb"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_by_published",
+  "flags":{"public":true},
+  "view":{
+    "table":"SwapOrder",
+    "type":"select",
+    "tag":"by_published",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "book":{"swaps":{"id":"{{i_swap_id}}"}},
+      "status":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_status}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application",
+            "name":"EnumOrderStatus"
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-by-published-bulk [15] 
+var swap_order_by_published_bulk = {
+  "input":[
+    {"symbol":"i_swap_id","type":"uuid"},
+    {"symbol":"i_swap_order_ids","type":"jsonb"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_by_published_bulk",
+  "flags":{"public":true},
+  "view":{
+    "table":"SwapOrder",
+    "type":"select",
+    "tag":"by_published_bulk",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "id":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/fn",
+          "name":"uuid",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[
+              {
+              "::":"sql/fn",
+              "name":"\"core/util\".as_array",
+              "args":[{"::":"sql/arg","name":"{{i_swap_order_ids}}"}]
+            }
+            ]
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "book":{"swaps":"{{i_swap_id}}"}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-by-status [15] 
+var swap_order_by_status = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_status","type":"jsonb"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_by_status",
+  "flags":{"personal":true},
+  "view":{
+    "table":"SwapOrder",
+    "type":"select",
+    "tag":"by_status",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "account":"{{i_account_id}}",
+      "status":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_status}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application",
+            "name":"EnumOrderStatus"
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-by-swap [15] 
+var swap_order_by_swap = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_swap_id","type":"uuid"},
+    {"symbol":"i_status","type":"jsonb"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_by_swap",
+  "flags":{"personal":true},
+  "view":{
+    "table":"SwapOrder",
+    "type":"select",
+    "tag":"by_swap",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "book":{"swaps":"{{i_swap_id}}"},
+      "account":"{{i_account_id}}"
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-by-managed-swap [15] 
+var swap_order_by_managed_swap = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_swap_id","type":"uuid"},
+    {"symbol":"i_start_frame","type":"bigint"},
+    {"symbol":"i_end_frame","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_by_managed_swap",
+  "flags":{"personal":true},
+  "view":{
+    "table":"SwapOrder",
+    "type":"select",
+    "tag":"by_managed_swap",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "book":{"swaps":"{{i_swap_id}}"},
+      "frame_created":["between","{{i_start_frame}}","and","{{i_end_frame}}"]
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_swap_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"swap/data-swap",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_swap_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-by-managed-swap-bulk [15] 
+var swap_order_by_managed_swap_bulk = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_swap_id","type":"uuid"},
+    {"symbol":"i_swap_order_ids","type":"jsonb"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_by_managed_swap_bulk",
+  "flags":{"personal":true},
+  "view":{
+    "table":"SwapOrder",
+    "type":"select",
+    "tag":"by_managed_swap_bulk",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "id":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/fn",
+          "name":"uuid",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[
+              {
+              "::":"sql/fn",
+              "name":"\"core/util\".as_array",
+              "args":[{"::":"sql/arg","name":"{{i_swap_order_ids}}"}]
+            }
+            ]
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "book":{"swaps":"{{i_swap_id}}"}
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_swap_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"swap/data-swap",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_swap_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-summary-by-swap [15] 
+var swap_order_summary_by_swap = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_swap_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_summary_by_swap",
+  "flags":{"personal":true},
+  "view":{
+    "table":"SwapOrderSummary",
+    "type":"select",
+    "tag":"by_swap",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"book":{"swaps":"{{i_swap_id}}"}},
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_swap_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"swap/data-swap",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_swap_id}}"]
+    }
+    ],
+    "autos":[
+      {
+      "function":{
+        "input":[{"symbol":"i_swap_id","type":"uuid"}],
+        "return":"jsonb",
+        "schema":"core/query-swap",
+        "id":"update_swap_order_summary",
+        "flags":{}
+      },
+      "args":["{{i_swap_id}}"]
+    }
+    ]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-strike-by-swap [15] 
+var swap_order_strike_by_swap = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_swap_id","type":"uuid"},
+    {"symbol":"i_start_frame","type":"bigint"},
+    {"symbol":"i_end_frame","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_strike_by_swap",
+  "flags":{"personal":true},
+  "view":{
+    "table":"SwapOrderStrike",
+    "type":"select",
+    "tag":"by_swap",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "book":{"swaps":"{{i_swap_id}}"},
+      "frame":["between","{{i_start_frame}}","and","{{i_end_frame}}"]
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_swap_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"swap/data-swap",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_swap_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-strike-summary-by-swap [15] 
+var swap_order_strike_summary_by_swap = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_swap_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_strike_summary_by_swap",
+  "flags":{"personal":true},
+  "view":{
+    "table":"SwapOrderStrikeSummary",
+    "type":"select",
+    "tag":"by_swap",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"book":{"swaps":"{{i_swap_id}}"}},
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_swap_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"swap/data-swap",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_swap_id}}"]
+    }
+    ],
+    "autos":[
+      {
+      "function":{
+        "input":[{"symbol":"i_swap_id","type":"uuid"}],
+        "return":"jsonb",
+        "schema":"core/query-swap",
+        "id":"update_swap_order_strike_summary",
+        "flags":{}
+      },
+      "args":["{{i_swap_id}}"]
+    }
+    ]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-log-by-published [15] 
+var swap_order_log_by_published = {
+  "input":[
+    {"symbol":"i_swap_id","type":"uuid"},
+    {"symbol":"i_status","type":"jsonb"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_log_by_published",
+  "flags":{"public":true},
+  "view":{
+    "table":"SwapOrderLog",
+    "type":"select",
+    "tag":"by_published",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "book":{"swaps":"{{i_swap_id}}"},
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-log-by-swap [15] 
+var swap_order_log_by_swap = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_swap_id","type":"uuid"},
+    {"symbol":"i_start_frame","type":"bigint"},
+    {"symbol":"i_end_frame","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_log_by_swap",
+  "flags":{"personal":true},
+  "view":{
+    "table":"SwapOrderLog",
+    "type":"select",
+    "tag":"by_swap",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "book":{"swaps":"{{i_swap_id}}"},
+      "frame":["between","{{i_start_frame}}","and","{{i_end_frame}}"]
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_swap_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"swap/data-swap",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_swap_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/rake-ledger-by-swap [15] 
+var rake_ledger_by_swap = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_swap_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"rake_ledger_by_swap",
+  "flags":{"personal":true},
+  "view":{
+    "table":"RakeLedger",
+    "type":"select",
+    "tag":"by_swap",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"book":{"swaps":"{{i_swap_id}}"}},
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_swap_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"swap/data-swap",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_swap_id}}"]
+    }
+    ],
+    "autos":[
+      {
+      "function":{
+        "input":[{"symbol":"i_swap_id","type":"uuid"}],
+        "return":"jsonb",
+        "schema":"core/ledger-rake",
+        "id":"get_updated_swap_ledger",
+        "flags":{}
+      },
+      "args":["{{i_swap_id}}"]
+    }
+    ]
+  }
+};
+
+// statsapi.list.view-swap/rake-entry-by-swap [15] 
+var rake_entry_by_swap = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_swap_id","type":"uuid"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"rake_entry_by_swap",
+  "flags":{"personal":true},
+  "view":{
+    "table":"RakeEntry",
+    "type":"select",
+    "tag":"by_swap",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "book":{"swaps":"{{i_swap_id}}"},
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_swap_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"swap/data-swap",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_swap_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-default [20] 
+var swap_default = {
+  "input":[{"symbol":"i_swap_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_default",
+  "flags":{},
+  "view":{
+    "table":"Swap",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      ["book",["*/standard"]],
+      ["currency_secondary",["*/standard"]],
+      ["currency_primary",["*/standard"]],
+      "*/standard"
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-full [20] 
+var swap_full = {
+  "input":[{"symbol":"i_swap_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_full",
+  "flags":{},
+  "view":{
+    "table":"Swap",
+    "type":"return",
+    "tag":"full",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      ["book",["*/standard"]],
+      ["currency_secondary",["*/standard"]],
+      [
+      "playable_primary",
+      [
+      [
+      "evm_vaults",
+      [
+      ["currency",["*/standard"]],
+      ["tx_create",["*/standard"]],
+      "*/standard"
+    ]
+    ],
+      ["rooms",["*/standard"]],
+      "*/standard",
+      ["gas_asset",[["currency",["*/standard"]],"*/standard"]],
+      ["summary",["*/standard"]]
+    ]
+    ],
+      ["currency_primary",["*/standard"]],
+      "*/standard",
+      [
+      "playable_secondary",
+      [
+      [
+      "evm_vaults",
+      [
+      ["currency",["*/standard"]],
+      ["tx_create",["*/standard"]],
+      "*/standard"
+    ]
+    ],
+      ["rooms",["*/standard"]],
+      "*/standard",
+      ["gas_asset",[["currency",["*/standard"]],"*/standard"]],
+      ["summary",["*/standard"]]
+    ]
+    ]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-log-summary-default [20] 
+var swap_order_log_summary_default = {
+  "input":[{"symbol":"i_summary_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_log_summary_default",
+  "flags":{},
+  "view":{
+    "table":"SwapOrderLogSummary",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-default [20] 
+var swap_order_default = {
+  "input":[{"symbol":"i_swap_order_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_default",
+  "flags":{},
+  "view":{
+    "table":"SwapOrder",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-with-owner [20] 
+var swap_order_with_owner = {
+  "input":[{"symbol":"i_swap_order_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_with_owner",
+  "flags":{},
+  "view":{
+    "table":"SwapOrder",
+    "type":"return",
+    "tag":"with_owner",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      "*/standard",
+      [
+      "account",
+      [
+      ["profile",["last_name","first_name","id","picture"]],
+      "nickname",
+      "id"
+    ]
+    ]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-detail [20] 
+var swap_order_detail = {
+  "input":[{"symbol":"i_swap_order_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_detail",
+  "flags":{},
+  "view":{
+    "table":"SwapOrder",
+    "type":"return",
+    "tag":"detail",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      [
+      "hold",
+      [
+      ["tx_rake",["*/standard"]],
+      "*/standard",
+      ["tx_unhold_primary",["*/standard"]],
+      ["tx_hold_secondary",["*/standard"]],
+      ["tx_hold_primary",["*/standard"]],
+      ["tx_unhold_secondary",["*/standard"]]
+    ]
+    ],
+      "*/standard"
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/tx-swap-order-default [20] 
+var tx_swap_order_default = {
+  "input":[{"symbol":"i_tx_swap_order_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"tx_swap_order_default",
+  "flags":{},
+  "view":{
+    "table":"TxSwapOrder",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-strike-history [20] 
+var swap_order_strike_history = {
+  "input":[{"symbol":"book_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_strike_history",
+  "flags":{},
+  "view":{
+    "table":"SwapOrder",
+    "type":"return",
+    "tag":"strike_history",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      ["bid_strikes","*/standard"],
+      ["ask_strikes","*/standard"],
+      "*/standard"
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-summary-default [20] 
+var swap_order_summary_default = {
+  "input":[{"symbol":"i_summary_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_summary_default",
+  "flags":{},
+  "view":{
+    "table":"SwapOrderSummary",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-strike-default [20] 
+var swap_order_strike_default = {
+  "input":[{"symbol":"i_strike_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_strike_default",
+  "flags":{},
+  "view":{
+    "table":"SwapOrderStrike",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-strike-summary-default [20] 
+var swap_order_strike_summary_default = {
+  "input":[{"symbol":"i_summary_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_strike_summary_default",
+  "flags":{},
+  "view":{
+    "table":"SwapOrderStrikeSummary",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-log-default [20] 
+var swap_order_log_default = {
+  "input":[{"symbol":"i_swap_order_log_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_log_default",
+  "flags":{},
+  "view":{
+    "table":"SwapOrderLog",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard",["order",["*/info"]]],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/swap-order-log-order [20] 
+var swap_order_log_order = {
+  "input":[{"symbol":"i_swap_order_log_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"swap_order_log_order",
+  "flags":{},
+  "view":{
+    "table":"SwapOrderLog",
+    "type":"return",
+    "tag":"order",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      "frame",
+      "time_created",
+      "id",
+      "seqtotal",
+      "action",
+      ["order",["amount","side","position"]]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/rake-entry-default-swap [20] 
+var rake_entry_default_swap = {
+  "input":[{"symbol":"i_entry_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-swap",
+  "id":"rake_entry_default_swap",
+  "flags":{},
+  "view":{
+    "table":"RakeEntry",
+    "type":"return",
+    "tag":"default_swap",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      "*/standard",
+      ["tx_swap_order_holds",["*/default",["order",["*/info"]]]]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-swap/make-views [23] 
+function make_views(){
+  return ut.collect_views([
+    swap_by_id_admin,
+    swap_by_organisation_admin,
+    swap_by_organisation_public,
+    swap_by_super_all,
+    swap_by_public_all,
+    swap_by_public_code,
+    swap_active_book,
+    swap_get_public_code,
+    swap_all_public,
+    swap_order_log_summary_by_swap,
+    swap_order_active,
+    swap_order_active_book,
+    tx_swap_order_for,
+    tx_swap_order_for_swap,
+    swap_order_by_published,
+    swap_order_by_published_bulk,
+    swap_order_by_status,
+    swap_order_by_swap,
+    swap_order_by_managed_swap,
+    swap_order_by_managed_swap_bulk,
+    swap_order_summary_by_swap,
+    swap_order_strike_by_swap,
+    swap_order_strike_summary_by_swap,
+    swap_order_log_by_published,
+    swap_order_log_by_swap,
+    rake_ledger_by_swap,
+    rake_entry_by_swap,
+    swap_default,
+    swap_full,
+    swap_order_log_summary_default,
+    swap_order_default,
+    swap_order_with_owner,
+    swap_order_detail,
+    tx_swap_order_default,
+    swap_order_strike_history,
+    swap_order_summary_default,
+    swap_order_strike_default,
+    swap_order_strike_summary_default,
+    swap_order_log_default,
+    swap_order_log_order,
+    rake_entry_default_swap
+  ]);
+}
+
+var MODULE = {
+  "swap_by_id_admin":swap_by_id_admin,
+  "swap_by_organisation_admin":swap_by_organisation_admin,
+  "swap_by_organisation_public":swap_by_organisation_public,
+  "swap_by_super_all":swap_by_super_all,
+  "swap_by_public_all":swap_by_public_all,
+  "swap_by_public_code":swap_by_public_code,
+  "swap_active_book":swap_active_book,
+  "swap_get_public_code":swap_get_public_code,
+  "swap_all_public":swap_all_public,
+  "swap_order_log_summary_by_swap":swap_order_log_summary_by_swap,
+  "swap_order_active":swap_order_active,
+  "swap_order_active_book":swap_order_active_book,
+  "tx_swap_order_for":tx_swap_order_for,
+  "tx_swap_order_for_swap":tx_swap_order_for_swap,
+  "swap_order_by_published":swap_order_by_published,
+  "swap_order_by_published_bulk":swap_order_by_published_bulk,
+  "swap_order_by_status":swap_order_by_status,
+  "swap_order_by_swap":swap_order_by_swap,
+  "swap_order_by_managed_swap":swap_order_by_managed_swap,
+  "swap_order_by_managed_swap_bulk":swap_order_by_managed_swap_bulk,
+  "swap_order_summary_by_swap":swap_order_summary_by_swap,
+  "swap_order_strike_by_swap":swap_order_strike_by_swap,
+  "swap_order_strike_summary_by_swap":swap_order_strike_summary_by_swap,
+  "swap_order_log_by_published":swap_order_log_by_published,
+  "swap_order_log_by_swap":swap_order_log_by_swap,
+  "rake_ledger_by_swap":rake_ledger_by_swap,
+  "rake_entry_by_swap":rake_entry_by_swap,
+  "swap_default":swap_default,
+  "swap_full":swap_full,
+  "swap_order_log_summary_default":swap_order_log_summary_default,
+  "swap_order_default":swap_order_default,
+  "swap_order_with_owner":swap_order_with_owner,
+  "swap_order_detail":swap_order_detail,
+  "tx_swap_order_default":tx_swap_order_default,
+  "swap_order_strike_history":swap_order_strike_history,
+  "swap_order_summary_default":swap_order_summary_default,
+  "swap_order_strike_default":swap_order_strike_default,
+  "swap_order_strike_summary_default":swap_order_strike_summary_default,
+  "swap_order_log_default":swap_order_log_default,
+  "swap_order_log_order":swap_order_log_order,
+  "rake_entry_default_swap":rake_entry_default_swap,
+  "make_views":make_views
+};
+
+module.exports = MODULE

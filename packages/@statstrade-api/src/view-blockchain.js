@@ -1,0 +1,2416 @@
+const ut = require("@xtalk/db/base-util")
+
+// statsapi.list.view-blockchain/evm-blockchain-all [15] 
+var evm_blockchain_all = {
+  "input":[],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_blockchain_all",
+  "flags":{"public":true},
+  "view":{
+    "table":"EvmBlockchain",
+    "type":"select",
+    "tag":"all",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-blockchain-by-contract-type [15] 
+var evm_blockchain_by_contract_type = {
+  "input":[{"symbol":"i_type","type":"citext"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_blockchain_by_contract_type",
+  "flags":{"public":true},
+  "view":{
+    "table":"EvmBlockchain",
+    "type":"select",
+    "tag":"by_contract_type",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"contracts":{"type":"{{i_type}}"}},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-user-by-account [15] 
+var evm_user_by_account = {
+  "input":[{"symbol":"i_account_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_user_by_account",
+  "flags":{"token":true},
+  "view":{
+    "table":"EvmUser",
+    "type":"select",
+    "tag":"by_account",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"account":"{{i_account_id}}"},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-user-verification-by-account [15] 
+var evm_user_verification_by_account = {
+  "input":[{"symbol":"i_account_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_user_verification_by_account",
+  "flags":{"token":true},
+  "view":{
+    "table":"EvmUserVerification",
+    "type":"select",
+    "tag":"by_account",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"account":"{{i_account_id}}"},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-contract-template-all [15] 
+var evm_contract_template_all = {
+  "input":[],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_contract_template_all",
+  "flags":{"public":true},
+  "view":{
+    "table":"EvmContractTemplate",
+    "type":"select",
+    "tag":"all",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-contract-by-type [15] 
+var evm_contract_by_type = {
+  "input":[{"symbol":"i_type","type":"citext"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_contract_by_type",
+  "flags":{"public":true},
+  "view":{
+    "table":"EvmContract",
+    "type":"select",
+    "tag":"by_type",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"type":"{{i_type}}"},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-contract-by-chain [15] 
+var evm_contract_by_chain = {
+  "input":[{"symbol":"i_chain_id","type":"citext"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_contract_by_chain",
+  "flags":{"public":true},
+  "view":{
+    "table":"EvmContract",
+    "type":"select",
+    "tag":"by_chain",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"chain":"{{i_chain_id}}"},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-contract-by-chain-bulk [15] 
+var evm_contract_by_chain_bulk = {
+  "input":[{"symbol":"i_chain_ids","type":"jsonb"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_contract_by_chain_bulk",
+  "flags":{"public":true},
+  "view":{
+    "table":"EvmContract",
+    "type":"select",
+    "tag":"by_chain_bulk",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "chain":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/fn",
+          "name":"citext",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_chain_ids}}"}]
+          }
+          ]
+        }
+        ]
+      }
+      ]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-token-erc20-single [15] 
+var evm_token_erc20_single = {
+  "input":[
+    {"symbol":"i_chain_id","type":"citext"},
+    {"symbol":"i_currency_id","type":"citext"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_token_erc20_single",
+  "flags":{"public":true},
+  "view":{
+    "table":"EvmTokenErc20",
+    "type":"select",
+    "tag":"single",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"chain":"{{i_chain_id}}","currency":"{{i_currency_id}}"},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-token-erc20-by-chain [15] 
+var evm_token_erc20_by_chain = {
+  "input":[{"symbol":"i_chain_id","type":"citext"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_token_erc20_by_chain",
+  "flags":{"public":true},
+  "view":{
+    "table":"EvmTokenErc20",
+    "type":"select",
+    "tag":"by_chain",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"chain":"{{i_chain_id}}"},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-token-erc20-by-chain-bulk [15] 
+var evm_token_erc20_by_chain_bulk = {
+  "input":[{"symbol":"i_chain_ids","type":"jsonb"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_token_erc20_by_chain_bulk",
+  "flags":{"public":true},
+  "view":{
+    "table":"EvmTokenErc20",
+    "type":"select",
+    "tag":"by_chain_bulk",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "chain":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/fn",
+          "name":"citext",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_chain_ids}}"}]
+          }
+          ]
+        }
+        ]
+      }
+      ]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-token-erc20-by-currency [15] 
+var evm_token_erc20_by_currency = {
+  "input":[{"symbol":"i_currency_id","type":"citext"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_token_erc20_by_currency",
+  "flags":{"public":true},
+  "view":{
+    "table":"EvmTokenErc20",
+    "type":"select",
+    "tag":"by_currency",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"currency":"{{i_currency_id}}"},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-tx-action-by-chain [15] 
+var evm_tx_action_by_chain = {
+  "input":[
+    {"symbol":"i_chain_id","type":"citext"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_tx_action_by_chain",
+  "flags":{"super":true},
+  "view":{
+    "table":"EvmTxAction",
+    "type":"select",
+    "tag":"by_chain",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "chain":"{{i_chain_id}}",
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-tx-action-by-type [15] 
+var evm_tx_action_by_type = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_type","type":"text"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_tx_action_by_type",
+  "flags":{"personal":true},
+  "view":{
+    "table":"EvmTxAction",
+    "type":"select",
+    "tag":"by_type",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"user":{"account":"{{i_account_id}}"},"type":"{{i_type}}"},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-tx-action-by-time [15] 
+var evm_tx_action_by_time = {
+  "input":[
+    {"symbol":"i_contract_id","type":"uuid"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_tx_action_by_time",
+  "flags":{},
+  "view":{
+    "table":"EvmTxAction",
+    "type":"select",
+    "tag":"by_time",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "contract":"{{i_contract_id}}",
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-tx-action-by-status [15] 
+var evm_tx_action_by_status = {
+  "input":[
+    {"symbol":"i_chain_id","type":"citext"},
+    {"symbol":"i_statuses","type":"jsonb"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_tx_action_by_status",
+  "flags":{},
+  "view":{
+    "table":"EvmTxAction",
+    "type":"select",
+    "tag":"by_status",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "chain":"{{i_chain_id}}",
+      "status":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_statuses}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application-evm",
+            "name":"EnumEvmActionStatus"
+          }
+          ]
+        }
+        ]
+      }
+      ]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-tx-event-by-chain [15] 
+var evm_tx_event_by_chain = {
+  "input":[
+    {"symbol":"i_chain_id","type":"citext"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_tx_event_by_chain",
+  "flags":{"super":true},
+  "view":{
+    "table":"EvmTxEvent",
+    "type":"select",
+    "tag":"by_chain",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "chain":"{{i_chain_id}}",
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-tx-event-by-tx-id [15] 
+var evm_tx_event_by_tx_id = {
+  "input":[
+    {"symbol":"i_chain_id","type":"citext"},
+    {"symbol":"i_tx_id","type":"citext"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_tx_event_by_tx_id",
+  "flags":{},
+  "view":{
+    "table":"EvmTxEvent",
+    "type":"select",
+    "tag":"by_tx_id",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"chain":"{{i_chain_id}}","txid":"{{i_tx_id}}"},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-tx-event-by-time [15] 
+var evm_tx_event_by_time = {
+  "input":[
+    {"symbol":"i_contract_id","type":"uuid"},
+    {"symbol":"i_types","type":"jsonb"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_tx_event_by_time",
+  "flags":{},
+  "view":{
+    "table":"EvmTxEvent",
+    "type":"select",
+    "tag":"by_time",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "contract":"{{i_contract_id}}",
+      "type":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/fn",
+          "name":"jsonb_array_elements_text",
+          "args":[{"::":"sql/arg","name":"{{i_types}}"}]
+        }
+        ]
+      }
+      ],
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-tx-event-by-status [15] 
+var evm_tx_event_by_status = {
+  "input":[
+    {"symbol":"i_chain_id","type":"citext"},
+    {"symbol":"i_statuses","type":"jsonb"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_tx_event_by_status",
+  "flags":{},
+  "view":{
+    "table":"EvmTxEvent",
+    "type":"select",
+    "tag":"by_status",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "chain":"{{i_chain_id}}",
+      "status":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_statuses}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application-evm",
+            "name":"EnumEvmEventStatus"
+          }
+          ]
+        }
+        ]
+      }
+      ]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-payment-user-by-time [15] 
+var evm_payment_user_by_time = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_payment_user_by_time",
+  "flags":{},
+  "view":{
+    "table":"EvmPaymentUser",
+    "type":"select",
+    "tag":"by_time",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "tx_event":{
+        "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+      },
+      "address_from":{"account":"{{i_account_id}}"}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-payment-playable-by-time [15] 
+var evm_payment_playable_by_time = {
+  "input":[
+    {"symbol":"i_playable_id","type":"uuid"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_payment_playable_by_time",
+  "flags":{},
+  "view":{
+    "table":"EvmPaymentPlayable",
+    "type":"select",
+    "tag":"by_time",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "tx_event":{
+        "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+      },
+      "playable":"{{i_playable_id}}"
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-payment-lost-by-time [15] 
+var evm_payment_lost_by_time = {
+  "input":[
+    {"symbol":"i_chain_id","type":"citext"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_payment_lost_by_time",
+  "flags":{},
+  "view":{
+    "table":"EvmPaymentLost",
+    "type":"select",
+    "tag":"by_time",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "tx_asset":{"asset":{"evm_blockchains":"{{i_chain_id}}"}},
+      "tx_event":{
+        "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+      }
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-faucet-entry-all [15] 
+var evm_faucet_entry_all = {
+  "input":[],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_faucet_entry_all",
+  "flags":{"public":true},
+  "view":{
+    "table":"EvmFaucetEntry",
+    "type":"select",
+    "tag":"all",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-faucet-entry-by-chain [15] 
+var evm_faucet_entry_by_chain = {
+  "input":[{"symbol":"i_chain_id","type":"citext"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_faucet_entry_by_chain",
+  "flags":{"public":true},
+  "view":{
+    "table":"EvmFaucetEntry",
+    "type":"select",
+    "tag":"by_chain",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"faucet":{"chain":"{{i_chain_id}}"}},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-blockchain-default [20] 
+var evm_blockchain_default = {
+  "input":[{"symbol":"i_chain_id","type":"citext"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_blockchain_default",
+  "flags":{},
+  "view":{
+    "table":"EvmBlockchain",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[["currency",["*/standard"]],"*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-blockchain-full [20] 
+var evm_blockchain_full = {
+  "input":[{"symbol":"i_chain_id","type":"citext"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_blockchain_full",
+  "flags":{},
+  "view":{
+    "table":"EvmBlockchain",
+    "type":"return",
+    "tag":"full",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      ["tokens",["*/standard"]],
+      "*/standard",
+      ["contracts",["*/standard"]]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-user-default [20] 
+var evm_user_default = {
+  "input":[{"symbol":"i_address_id","type":"citext"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_user_default",
+  "flags":{},
+  "view":{
+    "table":"EvmUser",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-user-verification-default [20] 
+var evm_user_verification_default = {
+  "input":[{"symbol":"i_verification_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_user_verification_default",
+  "flags":{},
+  "view":{
+    "table":"EvmUserVerification",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-contract-template-default [20] 
+var evm_contract_template_default = {
+  "input":[{"symbol":"i_contract_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_contract_template_default",
+  "flags":{},
+  "view":{
+    "table":"EvmContractTemplate",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-contract-default [20] 
+var evm_contract_default = {
+  "input":[{"symbol":"i_contract_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_contract_default",
+  "flags":{},
+  "view":{
+    "table":"EvmContract",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-token-erc20-default [20] 
+var evm_token_erc20_default = {
+  "input":[{"symbol":"i_token_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_token_erc20_default",
+  "flags":{},
+  "view":{
+    "table":"EvmTokenErc20",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-token-erc20-with-currency [20] 
+var evm_token_erc20_with_currency = {
+  "input":[{"symbol":"i_token_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_token_erc20_with_currency",
+  "flags":{},
+  "view":{
+    "table":"EvmTokenErc20",
+    "type":"return",
+    "tag":"with_currency",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[["currency"],"*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-tx-action-default [20] 
+var evm_tx_action_default = {
+  "input":[{"symbol":"i_action_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_tx_action_default",
+  "flags":{},
+  "view":{
+    "table":"EvmTxAction",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-tx-event-default [20] 
+var evm_tx_event_default = {
+  "input":[{"symbol":"i_event_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_tx_event_default",
+  "flags":{},
+  "view":{
+    "table":"EvmTxEvent",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-payment-user-default [20] 
+var evm_payment_user_default = {
+  "input":[{"symbol":"i_payment_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_payment_user_default",
+  "flags":{},
+  "view":{
+    "table":"EvmPaymentUser",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-payment-playable-default [20] 
+var evm_payment_playable_default = {
+  "input":[{"symbol":"i_payment_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_payment_playable_default",
+  "flags":{},
+  "view":{
+    "table":"EvmPaymentPlayable",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-payment-lost-default [20] 
+var evm_payment_lost_default = {
+  "input":[{"symbol":"i_payment_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_payment_lost_default",
+  "flags":{},
+  "view":{
+    "table":"EvmPaymentLost",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-faucet-entry-default [20] 
+var evm_faucet_entry_default = {
+  "input":[{"symbol":"i_event_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm",
+  "id":"evm_faucet_entry_default",
+  "flags":{},
+  "view":{
+    "table":"EvmFaucetEntry",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      ["token",[["currency",["*/standard"]],"*/standard"]],
+      "*/standard",
+      ["faucet",["*/standard"]]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-withdraw-by-room [25] 
+var evm_vault_withdraw_by_room = {
+  "input":[
+    {"symbol":"i_admin_id","type":"uuid"},
+    {"symbol":"i_room_id","type":"uuid"},
+    {"symbol":"i_statuses","type":"jsonb"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_withdraw_by_room",
+  "flags":{"personal":true},
+  "view":{
+    "table":"EvmVaultWithdraw",
+    "type":"select",
+    "tag":"by_room",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "account":{"vault":{"playable":{"rooms":"{{i_room_id}}"}}},
+      "status":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_statuses}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application-evm-vault",
+            "name":"EnumEvmVaultWithdrawStatus"
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_room_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"core/room-manage",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_admin_id}}","{{i_room_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-withdraw-by-room-account [25] 
+var evm_vault_withdraw_by_room_account = {
+  "input":[
+    {"symbol":"i_admin_id","type":"uuid"},
+    {"symbol":"i_room_id","type":"uuid"},
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_statuses","type":"jsonb"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_withdraw_by_room_account",
+  "flags":{"personal":true},
+  "view":{
+    "table":"EvmVaultWithdraw",
+    "type":"select",
+    "tag":"by_room_account",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "account":{
+        "vault":{"playable":{"rooms":"{{i_room_id}}"}},
+        "address":{"account":"{{i_account_id}}"}
+      },
+      "status":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_statuses}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application-evm-vault",
+            "name":"EnumEvmVaultWithdrawStatus"
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_room_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"core/room-manage",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_admin_id}}","{{i_room_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-withdraw-by-account [25] 
+var evm_vault_withdraw_by_account = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_room_id","type":"uuid"},
+    {"symbol":"i_statuses","type":"jsonb"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_withdraw_by_account",
+  "flags":{"personal":true},
+  "view":{
+    "table":"EvmVaultWithdraw",
+    "type":"select",
+    "tag":"by_account",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "account":{
+        "vault":{"playable":{"rooms":"{{i_room_id}}"}},
+        "address":{"account":"{{i_account_id}}"}
+      },
+      "status":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_statuses}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application-evm-vault",
+            "name":"EnumEvmVaultWithdrawStatus"
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-withdraw-by-id [25] 
+var evm_vault_withdraw_by_id = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_withdraw_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_withdraw_by_id",
+  "flags":{"personal":true},
+  "view":{
+    "table":"EvmVaultWithdraw",
+    "type":"select",
+    "tag":"by_id",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "id":"{{i_withdraw_id}}",
+      "account":{"address":{"account":"{{i_account_id}}"}}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-withdraw-by-room-confirmed [25] 
+var evm_vault_withdraw_by_room_confirmed = {
+  "input":[
+    {"symbol":"i_admin_id","type":"uuid"},
+    {"symbol":"i_room_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_withdraw_by_room_confirmed",
+  "flags":{"personal":true},
+  "view":{
+    "table":"EvmVaultWithdraw",
+    "type":"select",
+    "tag":"by_room_confirmed",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "account":{"vault":{"playable":{"rooms":"{{i_room_id}}"}}},
+      "status":[
+        "in",
+        [
+        [
+        "confirmed",
+        "site_confirm_queued",
+        "site_confirm_waiting",
+        "site_reject_queued",
+        "site_reject_waiting"
+      ]
+      ]
+      ]
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_room_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"core/room-manage",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_admin_id}}","{{i_room_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-withdraw-by-confirmed [25] 
+var evm_vault_withdraw_by_confirmed = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_room_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_withdraw_by_confirmed",
+  "flags":{"personal":true},
+  "view":{
+    "table":"EvmVaultWithdraw",
+    "type":"select",
+    "tag":"by_confirmed",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "account":{
+        "vault":{"playable":{"rooms":"{{i_room_id}}"}},
+        "address":{"account":"{{i_account_id}}"}
+      },
+      "status":[
+        "in",
+        [
+        [
+        "confirmed",
+        "site_confirm_queued",
+        "site_confirm_waiting",
+        "site_reject_queued",
+        "site_reject_waiting"
+      ]
+      ]
+      ]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-withdraw-by-bulk [25] 
+var evm_vault_withdraw_by_bulk = {
+  "input":[{"symbol":"i_room_ids","type":"jsonb"}],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_withdraw_by_bulk",
+  "flags":{},
+  "view":{
+    "table":"EvmVaultWithdraw",
+    "type":"select",
+    "tag":"by_bulk",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "account":{
+        "vault":{
+          "playable":{
+            "rooms":[
+              "in",
+              {
+              "::":"sql/select",
+              "args":[
+                {
+                "::":"sql/fn",
+                "name":"uuid",
+                "args":[
+                  {
+                  "::":"sql/fn",
+                  "name":"jsonb_array_elements_text",
+                  "args":[{"::":"sql/arg","name":"{{i_room_ids}}"}]
+                }
+                ]
+              }
+              ]
+            }
+            ]
+          }
+        }
+      },
+      "status":"confirmed"
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-deposit-by-room [25] 
+var evm_vault_deposit_by_room = {
+  "input":[
+    {"symbol":"i_admin_id","type":"uuid"},
+    {"symbol":"i_room_id","type":"uuid"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_deposit_by_room",
+  "flags":{"personal":true},
+  "view":{
+    "table":"EvmVaultDeposit",
+    "type":"select",
+    "tag":"by_room",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "account":{"vault":{"playable":{"rooms":"{{i_room_id}}"}}},
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_room_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"core/room-manage",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_admin_id}}","{{i_room_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-deposit-by-room-account [25] 
+var evm_vault_deposit_by_room_account = {
+  "input":[
+    {"symbol":"i_admin_id","type":"uuid"},
+    {"symbol":"i_room_id","type":"uuid"},
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_deposit_by_room_account",
+  "flags":{"personal":true},
+  "view":{
+    "table":"EvmVaultDeposit",
+    "type":"select",
+    "tag":"by_room_account",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "account":{
+        "vault":{"playable":{"rooms":"{{i_room_id}}"}},
+        "address":{"account":"{{i_account_id}}"}
+      },
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_room_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"core/room-manage",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_admin_id}}","{{i_room_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-deposit-by-account [25] 
+var evm_vault_deposit_by_account = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_room_id","type":"uuid"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_deposit_by_account",
+  "flags":{"personal":true},
+  "view":{
+    "table":"EvmVaultDeposit",
+    "type":"select",
+    "tag":"by_account",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "account":{
+        "vault":{"playable":{"rooms":"{{i_room_id}}"}},
+        "address":{"account":"{{i_account_id}}"}
+      },
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-event-by-room [25] 
+var evm_vault_event_by_room = {
+  "input":[
+    {"symbol":"i_admin_id","type":"uuid"},
+    {"symbol":"i_room_id","type":"uuid"},
+    {"symbol":"i_types","type":"jsonb"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_event_by_room",
+  "flags":{"personal":true},
+  "view":{
+    "table":"EvmVaultEvent",
+    "type":"select",
+    "tag":"by_room",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "account":{"vault":{"playable":{"rooms":"{{i_room_id}}"}}},
+      "tx_event":{
+        "type":[
+          "in",
+          {
+          "::":"sql/select",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_types}}"}]
+          }
+          ]
+        }
+        ]
+      },
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_room_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"core/room-manage",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_admin_id}}","{{i_room_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-event-by-room-account [25] 
+var evm_vault_event_by_room_account = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_room_id","type":"uuid"},
+    {"symbol":"i_types","type":"jsonb"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_event_by_room_account",
+  "flags":{"personal":true},
+  "view":{
+    "table":"EvmVaultEvent",
+    "type":"select",
+    "tag":"by_room_account",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "account":{
+        "vault":{"playable":{"rooms":"{{i_room_id}}"}},
+        "address":{"account":"{{i_account_id}}"}
+      },
+      "tx_event":{
+        "type":[
+          "in",
+          {
+          "::":"sql/select",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_types}}"}]
+          }
+          ]
+        }
+        ]
+      },
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-tx-action-by-room [25] 
+var evm_tx_action_by_room = {
+  "input":[
+    {"symbol":"i_admin_id","type":"uuid"},
+    {"symbol":"i_room_id","type":"uuid"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_tx_action_by_room",
+  "flags":{"personal":true},
+  "view":{
+    "table":"EvmTxAction",
+    "type":"select",
+    "tag":"by_room",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      {
+      "tx_open_evm_vault_accounts":{"vault":{"playable":{"rooms":"{{i_room_id}}"}}},
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+      {
+      "tx_close_evm_vault_accounts":{"vault":{"playable":{"rooms":"{{i_room_id}}"}}},
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    }
+    ],
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_room_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"core/room-manage",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_admin_id}}","{{i_room_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-account-by-user [25] 
+var evm_vault_account_by_user = {
+  "input":[{"symbol":"i_account_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_account_by_user",
+  "flags":{"personal":true},
+  "view":{
+    "table":"EvmVaultAccount",
+    "type":"select",
+    "tag":"by_user",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"address":{"account":"{{i_account_id}}"}},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-account-by-user-rooms [25] 
+var evm_vault_account_by_user_rooms = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_playable_ids","type":"jsonb"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_account_by_user_rooms",
+  "flags":{"personal":true},
+  "view":{
+    "table":"EvmVaultAccount",
+    "type":"select",
+    "tag":"by_user_rooms",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "vault":{
+        "playable":[
+          "in",
+          {
+          "::":"sql/select",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"uuid",
+            "args":[
+              {
+              "::":"sql/fn",
+              "name":"jsonb_array_elements_text",
+              "args":[{"::":"sql/arg","name":"{{i_playable_ids}}"}]
+            }
+            ]
+          }
+          ]
+        }
+        ]
+      },
+      "address":{"account":"{{i_account_id}}"}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-account-by-room [25] 
+var evm_vault_account_by_room = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_room_id","type":"uuid"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_account_by_room",
+  "flags":{"personal":true},
+  "view":{
+    "table":"EvmVaultAccount",
+    "type":"select",
+    "tag":"by_room",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "vault":{"playable":{"rooms":"{{i_room_id}}"}},
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_room_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"core/room-manage",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_room_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-account-by-room-id [25] 
+var evm_vault_account_by_room_id = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_room_id","type":"uuid"},
+    {"symbol":"i_member_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_account_by_room_id",
+  "flags":{"personal":true},
+  "view":{
+    "table":"EvmVaultAccount",
+    "type":"select",
+    "tag":"by_room_id",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "id":"{{i_member_id}}",
+      "vault":{"playable":{"rooms":"{{i_room_id}}"}}
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_room_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"core/room-manage",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_room_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-account-by-room-status [25] 
+var evm_vault_account_by_room_status = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_room_id","type":"uuid"},
+    {"symbol":"i_statuses","type":"jsonb"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_account_by_room_status",
+  "flags":{"personal":true},
+  "view":{
+    "table":"EvmVaultAccount",
+    "type":"select",
+    "tag":"by_room_status",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "vault":{"playable":{"rooms":"{{i_room_id}}"}},
+      "status":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_statuses}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application-evm-vault",
+            "name":"EnumEvmVaultAccountStatus"
+          }
+          ]
+        }
+        ]
+      }
+      ]
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_room_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"core/room-manage",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_room_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-account-by-requested-bulk [25] 
+var evm_vault_account_by_requested_bulk = {
+  "input":[{"symbol":"i_room_ids","type":"jsonb"}],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_account_by_requested_bulk",
+  "flags":{},
+  "view":{
+    "table":"EvmVaultAccount",
+    "type":"select",
+    "tag":"by_requested_bulk",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "vault":{
+        "playable":{
+          "rooms":[
+            "in",
+            {
+            "::":"sql/select",
+            "args":[
+              {
+              "::":"sql/fn",
+              "name":"uuid",
+              "args":[
+                {
+                "::":"sql/fn",
+                "name":"jsonb_array_elements_text",
+                "args":[{"::":"sql/arg","name":"{{i_room_ids}}"}]
+              }
+              ]
+            }
+            ]
+          }
+          ]
+        }
+      },
+      "status":"requested"
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-by-parent [25] 
+var evm_vault_by_parent = {
+  "input":[{"symbol":"i_room_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_by_parent",
+  "flags":{"public":true},
+  "view":{
+    "table":"EvmVault",
+    "type":"select",
+    "tag":"by_parent",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"playable":{"rooms":"{{i_room_id}}"}},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/tx-asset-for-room-gas-asset [25] 
+var tx_asset_for_room_gas_asset = {
+  "input":[
+    {"symbol":"i_admin_id","type":"uuid"},
+    {"symbol":"i_room_id","type":"uuid"},
+    {"symbol":"i_types","type":"jsonb"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"tx_asset_for_room_gas_asset",
+  "flags":{"personal":true},
+  "view":{
+    "table":"TxAsset",
+    "type":"select",
+    "tag":"for_room_gas_asset",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "type":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_types}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application",
+            "name":"EnumTxAssetType"
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "asset":{"playables":{"rooms":"{{i_room_id}}"}},
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_room_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"core/room-manage",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_admin_id}}","{{i_room_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-withdraw-default [30] 
+var evm_vault_withdraw_default = {
+  "input":[{"symbol":"i_withdraw_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_withdraw_default",
+  "flags":{},
+  "view":{
+    "table":"EvmVaultWithdraw",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-withdraw-full [30] 
+var evm_vault_withdraw_full = {
+  "input":[{"symbol":"i_withdraw_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_withdraw_full",
+  "flags":{},
+  "view":{
+    "table":"EvmVaultWithdraw",
+    "type":"return",
+    "tag":"full",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      ["tx_request",["*/standard"]],
+      ["tx_approve",["*/standard"]],
+      ["tx_fail",["*/standard"]],
+      "*/standard",
+      [
+      "returned",
+      [
+      ["tx_reject",["*/standard"]],
+      "*/standard",
+      ["tx_return",["*/standard"]]
+    ]
+    ],
+      ["tx_confirm",["*/standard"]],
+      ["tx_asset",["*/standard"]]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-withdraw-full-room [30] 
+var evm_vault_withdraw_full_room = {
+  "input":[{"symbol":"i_withdraw_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_withdraw_full_room",
+  "flags":{},
+  "view":{
+    "table":"EvmVaultWithdraw",
+    "type":"return",
+    "tag":"full_room",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      ["tx_request",["*/standard"]],
+      ["tx_approve",["*/standard"]],
+      ["tx_fail",["*/standard"]],
+      "*/standard",
+      [
+      "returned",
+      [
+      ["tx_reject",["*/standard"]],
+      "*/standard",
+      ["tx_return",["*/standard"]]
+    ]
+    ],
+      ["tx_confirm",["*/standard"]],
+      ["tx_asset",["*/standard"]],
+      [
+      "account",
+      [
+      ["address",["*/standard",["account",["nickname","id"]]]],
+      "*/standard"
+    ]
+    ]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-deposit-default [30] 
+var evm_vault_deposit_default = {
+  "input":[{"symbol":"i_deposit_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_deposit_default",
+  "flags":{},
+  "view":{
+    "table":"EvmVaultDeposit",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-deposit-full [30] 
+var evm_vault_deposit_full = {
+  "input":[{"symbol":"i_deposit_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_deposit_full",
+  "flags":{},
+  "view":{
+    "table":"EvmVaultDeposit",
+    "type":"return",
+    "tag":"full",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      ["tx_event",["*/standard"]],
+      "*/standard",
+      ["tx_asset",["*/standard"]]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-deposit-full-room [30] 
+var evm_vault_deposit_full_room = {
+  "input":[{"symbol":"i_deposit_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_deposit_full_room",
+  "flags":{},
+  "view":{
+    "table":"EvmVaultDeposit",
+    "type":"return",
+    "tag":"full_room",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      ["tx_event",["*/standard"]],
+      "*/standard",
+      ["tx_asset",["*/standard"]],
+      [
+      "account",
+      [
+      ["address",["*/standard",["account",["nickname","id"]]]],
+      "*/standard"
+    ]
+    ]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-event-default [30] 
+var evm_vault_event_default = {
+  "input":[{"symbol":"i_event_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_event_default",
+  "flags":{},
+  "view":{
+    "table":"EvmVaultEvent",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-event-full [30] 
+var evm_vault_event_full = {
+  "input":[{"symbol":"i_event_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_event_full",
+  "flags":{},
+  "view":{
+    "table":"EvmVaultEvent",
+    "type":"return",
+    "tag":"full",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      ["tx_event",["*/standard"]],
+      [
+      "account",
+      [
+      "*/standard",
+      [
+      "address",
+      ["*/standard",["account",["nickname","id",["profile"]]]]
+    ]
+    ]
+    ],
+      "*/standard"
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-tx-action-full-account [30] 
+var evm_tx_action_full_account = {
+  "input":[{"symbol":"i_account_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_tx_action_full_account",
+  "flags":{},
+  "view":{
+    "table":"EvmTxAction",
+    "type":"return",
+    "tag":"full_account",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      [
+      "tx_open_evm_vault_accounts",
+      [
+      "*/standard",
+      [
+      "address",
+      ["*/standard",["account",["nickname","id",["profile"]]]]
+    ]
+    ]
+    ],
+      "*/standard",
+      [
+      "tx_close_evm_vault_accounts",
+      [
+      "*/standard",
+      [
+      "address",
+      ["*/standard",["account",["nickname","id",["profile"]]]]
+    ]
+    ]
+    ]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-account-default [30] 
+var evm_vault_account_default = {
+  "input":[{"symbol":"i_room_account_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_account_default",
+  "flags":{},
+  "view":{
+    "table":"EvmVaultAccount",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      ["tx_close",["*/standard"]],
+      ["tx_open",["*/standard"]],
+      ["*/standard"],
+      ["tx_activate"],
+      "*/standard",
+      ["linked",[["asset"],"*/standard"]]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-account-full [30] 
+var evm_vault_account_full = {
+  "input":[{"symbol":"i_room_account_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_account_full",
+  "flags":{},
+  "view":{
+    "table":"EvmVaultAccount",
+    "type":"return",
+    "tag":"full",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      ["tx_close",["*/standard"]],
+      ["tx_open",["*/standard"]],
+      ["tx_activate",["*/standard"]],
+      "*/standard",
+      ["linked",[["asset"],"*/standard"]],
+      [
+      "address",
+      ["*/standard",["account",["nickname","id",["profile"]]]]
+    ]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-account-asset [30] 
+var evm_vault_account_asset = {
+  "input":[{"symbol":"i_room_account_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_account_asset",
+  "flags":{},
+  "view":{
+    "table":"EvmVaultAccount",
+    "type":"return",
+    "tag":"asset",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard",["linked",[["asset"],"*/standard"]]],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-default [30] 
+var evm_vault_default = {
+  "input":[{"symbol":"i_room_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_default",
+  "flags":{},
+  "view":{
+    "table":"EvmVault",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-vault-full [30] 
+var evm_vault_full = {
+  "input":[{"symbol":"i_room_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_vault_full",
+  "flags":{},
+  "view":{
+    "table":"EvmVault",
+    "type":"return",
+    "tag":"full",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      ["currency",["*/standard"]],
+      ["contract",[["chain",["*/standard"]],"*/standard"]],
+      "*/standard"
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-tx-event-vault-deposit [30] 
+var evm_tx_event_vault_deposit = {
+  "input":[{"symbol":"i_event_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_tx_event_vault_deposit",
+  "flags":{},
+  "view":{
+    "table":"EvmTxEvent",
+    "type":"return",
+    "tag":"vault_deposit",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      [
+      "evm_vault_deposits",
+      ["*/standard",["tx_asset",["*/standard"]]]
+    ],
+      "*/standard"
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/evm-tx-event-vault-payment [30] 
+var evm_tx_event_vault_payment = {
+  "input":[{"symbol":"i_event_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"evm_tx_event_vault_payment",
+  "flags":{},
+  "view":{
+    "table":"EvmTxEvent",
+    "type":"return",
+    "tag":"vault_payment",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      "*/standard",
+      [
+      "evm_payment_playables",
+      ["*/standard",["tx_asset",["*/standard"]]]
+    ],
+      [
+      "evm_payment_losts",
+      ["*/standard",["tx_asset",["*/standard"]]]
+    ]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/tx-asset-view-evm-vault [30] 
+var tx_asset_view_evm_vault = {
+  "input":[{"symbol":"i_tx_asset_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-evm-vault",
+  "id":"tx_asset_view_evm_vault",
+  "flags":{},
+  "view":{
+    "table":"TxAsset",
+    "type":"return",
+    "tag":"view_evm_vault",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      [
+      "evm_payment_playables",
+      [["tx_event",["*/standard"]],"*/standard"]
+    ],
+      ["fee_tx_close",[["tx_event",["*/standard"]],"*/standard"]],
+      "*/standard"
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-blockchain/make-views [33] 
+function make_views(){
+  return ut.collect_views([
+    evm_blockchain_all,
+    evm_blockchain_by_contract_type,
+    evm_user_by_account,
+    evm_user_verification_by_account,
+    evm_contract_template_all,
+    evm_contract_by_type,
+    evm_contract_by_chain,
+    evm_contract_by_chain_bulk,
+    evm_token_erc20_single,
+    evm_token_erc20_by_chain,
+    evm_token_erc20_by_chain_bulk,
+    evm_token_erc20_by_currency,
+    evm_tx_action_by_chain,
+    evm_tx_action_by_type,
+    evm_tx_action_by_time,
+    evm_tx_action_by_status,
+    evm_tx_event_by_chain,
+    evm_tx_event_by_tx_id,
+    evm_tx_event_by_time,
+    evm_tx_event_by_status,
+    evm_payment_user_by_time,
+    evm_payment_playable_by_time,
+    evm_payment_lost_by_time,
+    evm_faucet_entry_all,
+    evm_faucet_entry_by_chain,
+    evm_blockchain_default,
+    evm_blockchain_full,
+    evm_user_default,
+    evm_user_verification_default,
+    evm_contract_template_default,
+    evm_contract_default,
+    evm_token_erc20_default,
+    evm_token_erc20_with_currency,
+    evm_tx_action_default,
+    evm_tx_event_default,
+    evm_payment_user_default,
+    evm_payment_playable_default,
+    evm_payment_lost_default,
+    evm_faucet_entry_default,
+    evm_vault_withdraw_by_room,
+    evm_vault_withdraw_by_room_account,
+    evm_vault_withdraw_by_account,
+    evm_vault_withdraw_by_id,
+    evm_vault_withdraw_by_room_confirmed,
+    evm_vault_withdraw_by_confirmed,
+    evm_vault_withdraw_by_bulk,
+    evm_vault_deposit_by_room,
+    evm_vault_deposit_by_room_account,
+    evm_vault_deposit_by_account,
+    evm_vault_event_by_room,
+    evm_vault_event_by_room_account,
+    evm_tx_action_by_room,
+    evm_vault_account_by_user,
+    evm_vault_account_by_user_rooms,
+    evm_vault_account_by_room,
+    evm_vault_account_by_room_id,
+    evm_vault_account_by_room_status,
+    evm_vault_account_by_requested_bulk,
+    evm_vault_by_parent,
+    tx_asset_for_room_gas_asset,
+    evm_vault_withdraw_default,
+    evm_vault_withdraw_full,
+    evm_vault_withdraw_full_room,
+    evm_vault_deposit_default,
+    evm_vault_deposit_full,
+    evm_vault_deposit_full_room,
+    evm_vault_event_default,
+    evm_vault_event_full,
+    evm_tx_action_full_account,
+    evm_vault_account_default,
+    evm_vault_account_full,
+    evm_vault_account_asset,
+    evm_vault_default,
+    evm_vault_full,
+    evm_tx_event_vault_deposit,
+    evm_tx_event_vault_payment,
+    tx_asset_view_evm_vault
+  ]);
+}
+
+var MODULE = {
+  "evm_blockchain_all":evm_blockchain_all,
+  "evm_blockchain_by_contract_type":evm_blockchain_by_contract_type,
+  "evm_user_by_account":evm_user_by_account,
+  "evm_user_verification_by_account":evm_user_verification_by_account,
+  "evm_contract_template_all":evm_contract_template_all,
+  "evm_contract_by_type":evm_contract_by_type,
+  "evm_contract_by_chain":evm_contract_by_chain,
+  "evm_contract_by_chain_bulk":evm_contract_by_chain_bulk,
+  "evm_token_erc20_single":evm_token_erc20_single,
+  "evm_token_erc20_by_chain":evm_token_erc20_by_chain,
+  "evm_token_erc20_by_chain_bulk":evm_token_erc20_by_chain_bulk,
+  "evm_token_erc20_by_currency":evm_token_erc20_by_currency,
+  "evm_tx_action_by_chain":evm_tx_action_by_chain,
+  "evm_tx_action_by_type":evm_tx_action_by_type,
+  "evm_tx_action_by_time":evm_tx_action_by_time,
+  "evm_tx_action_by_status":evm_tx_action_by_status,
+  "evm_tx_event_by_chain":evm_tx_event_by_chain,
+  "evm_tx_event_by_tx_id":evm_tx_event_by_tx_id,
+  "evm_tx_event_by_time":evm_tx_event_by_time,
+  "evm_tx_event_by_status":evm_tx_event_by_status,
+  "evm_payment_user_by_time":evm_payment_user_by_time,
+  "evm_payment_playable_by_time":evm_payment_playable_by_time,
+  "evm_payment_lost_by_time":evm_payment_lost_by_time,
+  "evm_faucet_entry_all":evm_faucet_entry_all,
+  "evm_faucet_entry_by_chain":evm_faucet_entry_by_chain,
+  "evm_blockchain_default":evm_blockchain_default,
+  "evm_blockchain_full":evm_blockchain_full,
+  "evm_user_default":evm_user_default,
+  "evm_user_verification_default":evm_user_verification_default,
+  "evm_contract_template_default":evm_contract_template_default,
+  "evm_contract_default":evm_contract_default,
+  "evm_token_erc20_default":evm_token_erc20_default,
+  "evm_token_erc20_with_currency":evm_token_erc20_with_currency,
+  "evm_tx_action_default":evm_tx_action_default,
+  "evm_tx_event_default":evm_tx_event_default,
+  "evm_payment_user_default":evm_payment_user_default,
+  "evm_payment_playable_default":evm_payment_playable_default,
+  "evm_payment_lost_default":evm_payment_lost_default,
+  "evm_faucet_entry_default":evm_faucet_entry_default,
+  "evm_vault_withdraw_by_room":evm_vault_withdraw_by_room,
+  "evm_vault_withdraw_by_room_account":evm_vault_withdraw_by_room_account,
+  "evm_vault_withdraw_by_account":evm_vault_withdraw_by_account,
+  "evm_vault_withdraw_by_id":evm_vault_withdraw_by_id,
+  "evm_vault_withdraw_by_room_confirmed":evm_vault_withdraw_by_room_confirmed,
+  "evm_vault_withdraw_by_confirmed":evm_vault_withdraw_by_confirmed,
+  "evm_vault_withdraw_by_bulk":evm_vault_withdraw_by_bulk,
+  "evm_vault_deposit_by_room":evm_vault_deposit_by_room,
+  "evm_vault_deposit_by_room_account":evm_vault_deposit_by_room_account,
+  "evm_vault_deposit_by_account":evm_vault_deposit_by_account,
+  "evm_vault_event_by_room":evm_vault_event_by_room,
+  "evm_vault_event_by_room_account":evm_vault_event_by_room_account,
+  "evm_tx_action_by_room":evm_tx_action_by_room,
+  "evm_vault_account_by_user":evm_vault_account_by_user,
+  "evm_vault_account_by_user_rooms":evm_vault_account_by_user_rooms,
+  "evm_vault_account_by_room":evm_vault_account_by_room,
+  "evm_vault_account_by_room_id":evm_vault_account_by_room_id,
+  "evm_vault_account_by_room_status":evm_vault_account_by_room_status,
+  "evm_vault_account_by_requested_bulk":evm_vault_account_by_requested_bulk,
+  "evm_vault_by_parent":evm_vault_by_parent,
+  "tx_asset_for_room_gas_asset":tx_asset_for_room_gas_asset,
+  "evm_vault_withdraw_default":evm_vault_withdraw_default,
+  "evm_vault_withdraw_full":evm_vault_withdraw_full,
+  "evm_vault_withdraw_full_room":evm_vault_withdraw_full_room,
+  "evm_vault_deposit_default":evm_vault_deposit_default,
+  "evm_vault_deposit_full":evm_vault_deposit_full,
+  "evm_vault_deposit_full_room":evm_vault_deposit_full_room,
+  "evm_vault_event_default":evm_vault_event_default,
+  "evm_vault_event_full":evm_vault_event_full,
+  "evm_tx_action_full_account":evm_tx_action_full_account,
+  "evm_vault_account_default":evm_vault_account_default,
+  "evm_vault_account_full":evm_vault_account_full,
+  "evm_vault_account_asset":evm_vault_account_asset,
+  "evm_vault_default":evm_vault_default,
+  "evm_vault_full":evm_vault_full,
+  "evm_tx_event_vault_deposit":evm_tx_event_vault_deposit,
+  "evm_tx_event_vault_payment":evm_tx_event_vault_payment,
+  "tx_asset_view_evm_vault":tx_asset_view_evm_vault,
+  "make_views":make_views
+};
+
+module.exports = MODULE

@@ -1,0 +1,3326 @@
+const ut = require("@xtalk/db/base-util")
+
+// statsapi.list.view-topic/topic-by-id-admin [16] 
+var topic_by_id_admin = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_topic_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"topic_by_id_admin",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Topic",
+    "type":"select",
+    "tag":"by_id_admin",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"id":"{{i_topic_id}}"},
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_topic_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"prediction/data-topic",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_topic_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/topic-active [16] 
+var topic_active = {
+  "input":[{"symbol":"i_account_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"topic_active",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Topic",
+    "type":"select",
+    "tag":"active",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "prospects":{
+        "book":[
+          {
+          "contract_orders":{"account":"{{i_account_id}}","status":"active"}
+        },
+          {
+          "pairs":{
+            "contracts":{"status":"active"},
+            "portfolio":{"owner":"{{i_account_id}}"}
+          }
+        }
+        ]
+      }
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/topic-completed [16] 
+var topic_completed = {
+  "input":[{"symbol":"i_account_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"topic_completed",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Topic",
+    "type":"select",
+    "tag":"completed",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "prospects":{
+        "book":{
+          "pairs":{
+            "contracts":{"status":["in",[["won","lost","stalemate"]]]},
+            "portfolio":{"owner":"{{i_account_id}}"}
+          }
+        }
+      }
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/topic-get-public-name [16] 
+var topic_get_public_name = {
+  "input":[
+    {"symbol":"i_topic_code","type":"citext"},
+    {"symbol":"i_room_name","type":"citext"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"topic_get_public_name",
+  "flags":{"public":true},
+  "view":{
+    "table":"Topic",
+    "type":"select",
+    "tag":"get_public_name",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "code":"{{i_topic_code}}",
+      "status":"active",
+      "playable":{"rooms":{"name":"{{i_room_name}}"}}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/topic-by-organisation-system [16] 
+var topic_by_organisation_system = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_organisation_ids","type":"jsonb"},
+    {"symbol":"i_status","type":"jsonb"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"topic_by_organisation_system",
+  "flags":{},
+  "view":{
+    "table":"Topic",
+    "type":"select",
+    "tag":"by_organisation_system",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "__deleted__":false,
+      "status":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_status}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application-prediction",
+            "name":"EnumTopicStatus"
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "organisation":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/fn",
+          "name":"uuid",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_organisation_ids}}"}]
+          }
+          ]
+        }
+        ]
+      }
+      ]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/topic-by-organisation-admin [16] 
+var topic_by_organisation_admin = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_organisation_ids","type":"jsonb"},
+    {"symbol":"i_status","type":"jsonb"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"topic_by_organisation_admin",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Topic",
+    "type":"select",
+    "tag":"by_organisation_admin",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "__deleted__":false,
+      "playable":["is_null"],
+      "status":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_status}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application-prediction",
+            "name":"EnumTopicStatus"
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "organisation":[
+        {
+        "id":[
+          "in",
+          {
+          "::":"sql/select",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"uuid",
+            "args":[
+              {
+              "::":"sql/fn",
+              "name":"jsonb_array_elements_text",
+              "args":[{"::":"sql/arg","name":"{{i_organisation_ids}}"}]
+            }
+            ]
+          }
+          ]
+        }
+        ],
+        "owner":"{{i_account_id}}"
+      },
+        {
+        "id":[
+          "in",
+          {
+          "::":"sql/select",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"uuid",
+            "args":[
+              {
+              "::":"sql/fn",
+              "name":"jsonb_array_elements_text",
+              "args":[{"::":"sql/arg","name":"{{i_organisation_ids}}"}]
+            }
+            ]
+          }
+          ]
+        }
+        ],
+        "access":{"entries":{"account":"{{i_account_id}}","role":"admin"}}
+      }
+      ]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/topic-by-room-admin [16] 
+var topic_by_room_admin = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_room_ids","type":"jsonb"},
+    {"symbol":"i_status","type":"jsonb"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"topic_by_room_admin",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Topic",
+    "type":"select",
+    "tag":"by_room_admin",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "__deleted__":false,
+      "playable":{
+        "rooms":[
+          "in",
+          {
+          "::":"sql/select",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"uuid",
+            "args":[
+              {
+              "::":"sql/fn",
+              "name":"jsonb_array_elements_text",
+              "args":[{"::":"sql/arg","name":"{{i_room_ids}}"}]
+            }
+            ]
+          }
+          ]
+        }
+        ]
+      },
+      "organisation":[
+        {"owner":"{{i_account_id}}"},
+        {
+        "access":{"entries":{"account":"{{i_account_id}}","role":"admin"}}
+      }
+      ],
+      "status":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_status}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application-prediction",
+            "name":"EnumTopicStatus"
+          }
+          ]
+        }
+        ]
+      }
+      ]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/topic-all-cash-admin [16] 
+var topic_all_cash_admin = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_status","type":"jsonb"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"topic_all_cash_admin",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Topic",
+    "type":"select",
+    "tag":"all_cash_admin",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "__deleted__":false,
+      "playable":["is_null"],
+      "status":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_status}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application-prediction",
+            "name":"EnumTopicStatus"
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "organisation":[
+        {"owner":"{{i_account_id}}"},
+        {
+        "access":{"entries":{"account":"{{i_account_id}}","role":"admin"}}
+      }
+      ]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/topic-all-public-cash [16] 
+var topic_all_public_cash = {
+  "input":[],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"topic_all_public_cash",
+  "flags":{"public":true},
+  "view":{
+    "table":"Topic",
+    "type":"select",
+    "tag":"all_public_cash",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"status":"active","playable":["is_null"]},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/topic-by-organisation-name-active [16] 
+var topic_by_organisation_name_active = {
+  "input":[{"symbol":"i_org_name","type":"text"}],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"topic_by_organisation_name_active",
+  "flags":{"public":true},
+  "view":{
+    "table":"Topic",
+    "type":"select",
+    "tag":"by_organisation_name_active",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "status":"active",
+      "playable":["is_null"],
+      "organisation":{"name":"{{i_org_name}}"}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/topic-by-organisation-name-completed [16] 
+var topic_by_organisation_name_completed = {
+  "input":[{"symbol":"i_org_name","type":"text"}],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"topic_by_organisation_name_completed",
+  "flags":{"public":true},
+  "view":{
+    "table":"Topic",
+    "type":"select",
+    "tag":"by_organisation_name_completed",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "status":"completed",
+      "playable":["is_null"],
+      "organisation":{"name":"{{i_org_name}}"}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/topic-by-playable-active [16] 
+var topic_by_playable_active = {
+  "input":[{"symbol":"i_playable_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"topic_by_playable_active",
+  "flags":{"public":true},
+  "view":{
+    "table":"Topic",
+    "type":"select",
+    "tag":"by_playable_active",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"status":"active","playable":"{{i_playable_id}}"},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/topic-by-playable-completed [16] 
+var topic_by_playable_completed = {
+  "input":[{"symbol":"i_playable_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"topic_by_playable_completed",
+  "flags":{"public":true},
+  "view":{
+    "table":"Topic",
+    "type":"select",
+    "tag":"by_playable_completed",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"status":"completed","playable":"{{i_playable_id}}"},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/tx-topic-status-by-topic [16] 
+var tx_topic_status_by_topic = {
+  "input":[{"symbol":"i_topic_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"tx_topic_status_by_topic",
+  "flags":{"public":true},
+  "view":{
+    "table":"TxTopicStatus",
+    "type":"select",
+    "tag":"by_topic",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"topic":"{{i_topic_id}}"},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/starred-by-topic [16] 
+var starred_by_topic = {
+  "input":[{"symbol":"i_topic_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"starred_by_topic",
+  "flags":{"public":true},
+  "view":{
+    "table":"Starred",
+    "type":"select",
+    "tag":"by_topic",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"topics":"{{i_topic_id}}"},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/starred-by-prospect [16] 
+var starred_by_prospect = {
+  "input":[{"symbol":"i_prospect_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"starred_by_prospect",
+  "flags":{"public":true},
+  "view":{
+    "table":"Starred",
+    "type":"select",
+    "tag":"by_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"prospects":"{{i_prospect_id}}"},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/starred-entry-by-topic [16] 
+var starred_entry_by_topic = {
+  "input":[
+    {"symbol":"i_topic_id","type":"uuid"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"starred_entry_by_topic",
+  "flags":{"public":true},
+  "view":{
+    "table":"StarredEntry",
+    "type":"select",
+    "tag":"by_topic",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "target":{"topics":"{{i_topic_id}}"},
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/starred-entry-by-prospect [16] 
+var starred_entry_by_prospect = {
+  "input":[
+    {"symbol":"i_prospect_id","type":"uuid"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"starred_entry_by_prospect",
+  "flags":{"public":true},
+  "view":{
+    "table":"StarredEntry",
+    "type":"select",
+    "tag":"by_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "target":{"prospects":"{{i_prospect_id}}"},
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/topic-default [21] 
+var topic_default = {
+  "input":[{"symbol":"i_topic_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"topic_default",
+  "flags":{},
+  "view":{
+    "table":"Topic",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/topic-standard [21] 
+var topic_standard = {
+  "input":[{"symbol":"i_topic_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"topic_standard",
+  "flags":{},
+  "view":{
+    "table":"Topic",
+    "type":"return",
+    "tag":"standard",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[["prospects",["*/standard"]],"*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/topic-full [21] 
+var topic_full = {
+  "input":[{"symbol":"i_topic_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"topic_full",
+  "flags":{},
+  "view":{
+    "table":"Topic",
+    "type":"return",
+    "tag":"full",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      ["tx_statuses",["*/standard"]],
+      "*/standard",
+      ["starred",["*/standard"]],
+      [
+      "prospects",
+      [
+      ["book",[["stake_ledgers",["*/standard"]],"*/standard"]],
+      ["tx_statuses",["*/standard"]],
+      "*/standard",
+      ["starred",["*/standard"]],
+      ["verdicts",["*/standard"]],
+      ["verdict_singles",["*/standard"]]
+    ]
+    ]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/topic-full-display [21] 
+var topic_full_display = {
+  "input":[{"symbol":"i_topic_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"topic_full_display",
+  "flags":{},
+  "view":{
+    "table":"Topic",
+    "type":"return",
+    "tag":"full_display",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      ["tx_statuses",["*/standard"]],
+      "*/standard",
+      ["starred",["*/standard"]],
+      [
+      "brand_topic_sponsorships",
+      [["brand",["*/standard"]],"*/standard"]
+    ],
+      ["organisation",["*/standard"]],
+      [
+      "prospects",
+      [
+      ["book",[["stake_ledgers",["*/standard"]],"*/standard"]],
+      ["tx_statuses",["*/standard"]],
+      "*/standard",
+      ["starred",["*/standard"]],
+      ["verdicts",["*/standard"]],
+      ["verdict_singles",["*/standard"]]
+    ]
+    ]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/tx-topic-status-default [21] 
+var tx_topic_status_default = {
+  "input":[{"symbol":"i_tx_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"tx_topic_status_default",
+  "flags":{"public":true},
+  "view":{
+    "table":"TxTopicStatus",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/starred-default [21] 
+var starred_default = {
+  "input":[{"symbol":"i_starred_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"starred_default",
+  "flags":{"public":true},
+  "view":{
+    "table":"Starred",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/starred-entry-default [21] 
+var starred_entry_default = {
+  "input":[{"symbol":"i_starred_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-topic",
+  "id":"starred_entry_default",
+  "flags":{"public":true},
+  "view":{
+    "table":"StarredEntry",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/prospect-by-id-admin [26] 
+var prospect_by_id_admin = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prospect",
+  "id":"prospect_by_id_admin",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Prospect",
+    "type":"select",
+    "tag":"by_id_admin",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"id":"{{i_prospect_id}}"},
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_prospect_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"prediction/data-prospect",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_prospect_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/prospect-all-public-cash [26] 
+var prospect_all_public_cash = {
+  "input":[],
+  "return":"jsonb",
+  "schema":"core/query-prospect",
+  "id":"prospect_all_public_cash",
+  "flags":{"public":true},
+  "view":{
+    "table":"Prospect",
+    "type":"select",
+    "tag":"all_public_cash",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"topic":{"playable":["is_null"],"status":"active"}},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/prospect-get-public-cash [26] 
+var prospect_get_public_cash = {
+  "input":[{"symbol":"i_prospect_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prospect",
+  "id":"prospect_get_public_cash",
+  "flags":{"public":true},
+  "view":{
+    "table":"Prospect",
+    "type":"select",
+    "tag":"get_public_cash",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "id":"{{i_prospect_id}}",
+      "topic":{"playable":["is_null"],"status":"active"}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/prospect-get-public-name [26] 
+var prospect_get_public_name = {
+  "input":[
+    {"symbol":"i_room_name","type":"citext"},
+    {"symbol":"i_topic_code","type":"citext"},
+    {"symbol":"i_prospect_name","type":"citext"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prospect",
+  "id":"prospect_get_public_name",
+  "flags":{"public":true},
+  "view":{
+    "table":"Prospect",
+    "type":"select",
+    "tag":"get_public_name",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "name":"{{i_prospect_name}}",
+      "topic":{
+        "code":"{{i_topic_code}}",
+        "status":"active",
+        "playable":{"rooms":{"name":"{{i_room_name}}"}}
+      }
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/prospect-active [26] 
+var prospect_active = {
+  "input":[{"symbol":"i_account_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prospect",
+  "id":"prospect_active",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Prospect",
+    "type":"select",
+    "tag":"active",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "book":[
+        {
+        "contract_orders":{"account":"{{i_account_id}}","status":"active"}
+      },
+        {
+        "pairs":{
+          "contracts":{"status":"active"},
+          "portfolio":{"owner":"{{i_account_id}}"}
+        }
+      }
+      ]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/prospect-completed [26] 
+var prospect_completed = {
+  "input":[{"symbol":"i_account_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prospect",
+  "id":"prospect_completed",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Prospect",
+    "type":"select",
+    "tag":"completed",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "book":{
+        "pairs":{
+          "contracts":{"status":["in",[["won","lost","stalemate"]]]},
+          "portfolio":{"owner":"{{i_account_id}}"}
+        }
+      }
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/tx-prospect-status-by-prospect [26] 
+var tx_prospect_status_by_prospect = {
+  "input":[{"symbol":"i_prospect_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prospect",
+  "id":"tx_prospect_status_by_prospect",
+  "flags":{"public":true},
+  "view":{
+    "table":"TxProspectStatus",
+    "type":"select",
+    "tag":"by_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"prospect":"{{i_prospect_id}}"},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/prospect-default [31] 
+var prospect_default = {
+  "input":[{"symbol":"i_prospect_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prospect",
+  "id":"prospect_default",
+  "flags":{},
+  "view":{
+    "table":"Prospect",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/prospect-full [31] 
+var prospect_full = {
+  "input":[{"symbol":"i_prospect_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prospect",
+  "id":"prospect_full",
+  "flags":{},
+  "view":{
+    "table":"Prospect",
+    "type":"return",
+    "tag":"full",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      ["currency"],
+      ["tx_statuses",["*/standard"]],
+      [
+      "book",
+      [
+      ["rake",["*/standard"]],
+      ["stake_ledgers",["*/standard"]],
+      "*/standard"
+    ]
+    ],
+      "*/standard",
+      ["starred",["*/standard"]],
+      ["verdicts",["*/standard"]],
+      ["verdict_singles",["*/standard"]],
+      ["topic",["*/standard"]]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/prospect-full-display [31] 
+var prospect_full_display = {
+  "input":[{"symbol":"i_prospect_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prospect",
+  "id":"prospect_full_display",
+  "flags":{},
+  "view":{
+    "table":"Prospect",
+    "type":"return",
+    "tag":"full_display",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      ["currency"],
+      ["tx_statuses",["*/standard"]],
+      [
+      "book",
+      [
+      ["rake",["*/standard"]],
+      ["stake_ledgers",["*/standard"]],
+      "*/standard"
+    ]
+    ],
+      "*/standard",
+      ["starred",["*/standard"]],
+      ["verdicts",["*/standard"]],
+      [
+      "topic",
+      [
+      ["playable",["*/standard"]],
+      "*/standard",
+      [
+      "brand_topic_sponsorships",
+      [["brand",["*/standard"]],"*/standard"]
+    ],
+      ["organisation",["*/standard"]]
+    ]
+    ],
+      ["verdict_singles",["*/standard"]]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/tx-prospect-status-default [31] 
+var tx_prospect_status_default = {
+  "input":[{"symbol":"i_tx_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prospect",
+  "id":"tx_prospect_status_default",
+  "flags":{"public":true},
+  "view":{
+    "table":"TxProspectStatus",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-active [36] 
+var contract_active = {
+  "input":[{"symbol":"i_account_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_active",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Contract",
+    "type":"select",
+    "tag":"active",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "status":"active",
+      "pair":{"portfolio":{"owner":"{{i_account_id}}"}}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-active-book [36] 
+var contract_active_book = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_book_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_active_book",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Contract",
+    "type":"select",
+    "tag":"active_book",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "status":"active",
+      "pair":{
+        "book":"{{i_book_id}}",
+        "portfolio":{"owner":"{{i_account_id}}"}
+      }
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/tx-contract-for [36] 
+var tx_contract_for = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_contract_id","type":"uuid"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"tx_contract_for",
+  "flags":{"personal":true},
+  "view":{
+    "table":"TxContract",
+    "type":"select",
+    "tag":"for",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "contract":{
+        "id":"{{i_contract_id}}",
+        "pair":{"portfolio":{"owner":"{{i_account_id}}"}}
+      },
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-by-status [36] 
+var contract_by_status = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_status","type":"jsonb"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_by_status",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Contract",
+    "type":"select",
+    "tag":"by_status",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "status":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_status}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application-prediction",
+            "name":"EnumContractStatusType"
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "time_updated":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-pair-by-managed-prospect [36] 
+var contract_pair_by_managed_prospect = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_pair_by_managed_prospect",
+  "flags":{"personal":true},
+  "view":{
+    "table":"ContractPair",
+    "type":"select",
+    "tag":"by_managed_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"book":{"prospect":"{{i_prospect_id}}"}},
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_prospect_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"prediction/data-prospect",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_prospect_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-pair-summary-by-prospect [36] 
+var contract_pair_summary_by_prospect = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_pair_summary_by_prospect",
+  "flags":{"personal":true},
+  "view":{
+    "table":"ContractPairSummary",
+    "type":"select",
+    "tag":"by_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"book":{"prospect":"{{i_prospect_id}}"}},
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_prospect_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"prediction/data-prospect",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_prospect_id}}"]
+    }
+    ],
+    "autos":[
+      {
+      "function":{
+        "input":[{"symbol":"i_prospect_id","type":"uuid"}],
+        "return":"jsonb",
+        "schema":"core/query-prediction",
+        "id":"update_contract_pair_summary",
+        "flags":{}
+      },
+      "args":["{{i_prospect_id}}"]
+    }
+    ]
+  }
+};
+
+// statsapi.list.view-topic/contract-pair-by-active [36] 
+var contract_pair_by_active = {
+  "input":[{"symbol":"i_account_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_pair_by_active",
+  "flags":{"personal":true},
+  "view":{
+    "table":"ContractPair",
+    "type":"select",
+    "tag":"by_active",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "contracts":{"status":"active"},
+      "portfolio":{"owner":"{{i_account_id}}"}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-pair-by-active-room [36] 
+var contract_pair_by_active_room = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_room_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_pair_by_active_room",
+  "flags":{"personal":true},
+  "view":{
+    "table":"ContractPair",
+    "type":"select",
+    "tag":"by_active_room",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "contracts":{"status":"active"},
+      "book":{"prospect":{"topic":{"playable":{"rooms":"{{i_room_id}}"}}}},
+      "portfolio":{"owner":"{{i_account_id}}"}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-pair-by-complete-room [36] 
+var contract_pair_by_complete_room = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_room_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_pair_by_complete_room",
+  "flags":{"personal":true},
+  "view":{
+    "table":"ContractPair",
+    "type":"select",
+    "tag":"by_complete_room",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "contracts":{"status":["in",[["won","lost","stalemate"]]]},
+      "book":{"prospect":{"topic":{"playable":{"rooms":"{{i_room_id}}"}}}},
+      "portfolio":{"owner":"{{i_account_id}}"}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/stake-by-status [36] 
+var stake_by_status = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_status","type":"jsonb"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"stake_by_status",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Stake",
+    "type":"select",
+    "tag":"by_status",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "portfolio":{"owner":"{{i_account_id}}"},
+      "status":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_status}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application-prediction",
+            "name":"EnumStakeStatusType"
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/stake-by-prospect [36] 
+var stake_by_prospect = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"},
+    {"symbol":"i_status","type":"jsonb"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"stake_by_prospect",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Stake",
+    "type":"select",
+    "tag":"by_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "book":{"prospect":"{{i_prospect_id}}"},
+      "portfolio":{"owner":"{{i_account_id}}"}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/stake-by-managed-prospect [36] 
+var stake_by_managed_prospect = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"stake_by_managed_prospect",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Stake",
+    "type":"select",
+    "tag":"by_managed_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"book":{"prospect":"{{i_prospect_id}}"}},
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_prospect_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"prediction/data-prospect",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_prospect_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/stake-summary-by-prospect [36] 
+var stake_summary_by_prospect = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"stake_summary_by_prospect",
+  "flags":{"personal":true},
+  "view":{
+    "table":"StakeSummary",
+    "type":"select",
+    "tag":"by_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"book":{"prospect":"{{i_prospect_id}}"}},
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_prospect_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"prediction/data-prospect",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_prospect_id}}"]
+    }
+    ],
+    "autos":[
+      {
+      "function":{
+        "input":[{"symbol":"i_prospect_id","type":"uuid"}],
+        "return":"jsonb",
+        "schema":"core/query-prediction",
+        "id":"update_stake_summary",
+        "flags":{}
+      },
+      "args":["{{i_prospect_id}}"]
+    }
+    ]
+  }
+};
+
+// statsapi.list.view-topic/stake-by-active [36] 
+var stake_by_active = {
+  "input":[{"symbol":"i_account_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"stake_by_active",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Stake",
+    "type":"select",
+    "tag":"by_active",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"status":"active","portfolio":{"owner":"{{i_account_id}}"}},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/stake-by-active-room [36] 
+var stake_by_active_room = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_room_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"stake_by_active_room",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Stake",
+    "type":"select",
+    "tag":"by_active_room",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "status":"active",
+      "book":{"prospect":{"topic":{"playable":{"rooms":"{{i_room_id}}"}}}},
+      "portfolio":{"owner":"{{i_account_id}}"}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/stake-by-complete-room [36] 
+var stake_by_complete_room = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_room_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"stake_by_complete_room",
+  "flags":{"personal":true},
+  "view":{
+    "table":"Stake",
+    "type":"select",
+    "tag":"by_complete_room",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "status":"claimed",
+      "book":{"prospect":{"topic":{"playable":{"rooms":"{{i_room_id}}"}}}},
+      "portfolio":{"owner":"{{i_account_id}}"}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-log-summary-by-prospect [36] 
+var contract_order_log_summary_by_prospect = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_log_summary_by_prospect",
+  "flags":{"personal":true},
+  "view":{
+    "table":"ContractOrderLogSummary",
+    "type":"select",
+    "tag":"by_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"book":{"prospect":"{{i_prospect_id}}"}},
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_prospect_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"prediction/data-prospect",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_prospect_id}}"]
+    }
+    ],
+    "autos":[
+      {
+      "function":{
+        "input":[{"symbol":"i_prospect_id","type":"uuid"}],
+        "return":"jsonb",
+        "schema":"core/query-prediction",
+        "id":"update_order_log_summary",
+        "flags":{}
+      },
+      "args":["{{i_prospect_id}}"]
+    }
+    ]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-active [36] 
+var contract_order_active = {
+  "input":[{"symbol":"i_account_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_active",
+  "flags":{"personal":true},
+  "view":{
+    "table":"ContractOrder",
+    "type":"select",
+    "tag":"active",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"account":"{{i_account_id}}","status":"active"},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-active-book [36] 
+var contract_order_active_book = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_book_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_active_book",
+  "flags":{"personal":true},
+  "view":{
+    "table":"ContractOrder",
+    "type":"select",
+    "tag":"active_book",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "account":"{{i_account_id}}",
+      "status":"active",
+      "book":"{{i_book_id}}"
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/tx-contract-order-for [36] 
+var tx_contract_order_for = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_contract_order_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"tx_contract_order_for",
+  "flags":{"personal":true},
+  "view":{
+    "table":"TxContractOrder",
+    "type":"select",
+    "tag":"for",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "order":{"id":"{{i_contract_order_id}}","account":"{{i_account_id}}"}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/tx-contract-order-for-prospect [36] 
+var tx_contract_order_for_prospect = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"tx_contract_order_for_prospect",
+  "flags":{"personal":true},
+  "view":{
+    "table":"TxContractOrder",
+    "type":"select",
+    "tag":"for_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "order":{
+        "book":{"prospect":"{{i_prospect_id}}"},
+        "account":"{{i_account_id}}"
+      },
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-by-published [36] 
+var contract_order_by_published = {
+  "input":[
+    {"symbol":"i_prospect_id","type":"uuid"},
+    {"symbol":"i_status","type":"jsonb"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_by_published",
+  "flags":{"public":true},
+  "view":{
+    "table":"ContractOrder",
+    "type":"select",
+    "tag":"by_published",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "book":{
+        "prospect":{"id":"{{i_prospect_id}}","topic":{"publish":"book"}}
+      },
+      "status":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_status}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application",
+            "name":"EnumOrderStatus"
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-by-published-bulk [36] 
+var contract_order_by_published_bulk = {
+  "input":[
+    {"symbol":"i_prospect_id","type":"uuid"},
+    {"symbol":"i_contract_order_ids","type":"jsonb"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_by_published_bulk",
+  "flags":{"public":true},
+  "view":{
+    "table":"ContractOrder",
+    "type":"select",
+    "tag":"by_published_bulk",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "id":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/fn",
+          "name":"uuid",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[
+              {
+              "::":"sql/fn",
+              "name":"\"core/util\".as_array",
+              "args":[{"::":"sql/arg","name":"{{i_contract_order_ids}}"}]
+            }
+            ]
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "book":{"prospect":{"id":"{{i_prospect_id}}"}}
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-by-status [36] 
+var contract_order_by_status = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_status","type":"jsonb"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_by_status",
+  "flags":{"personal":true},
+  "view":{
+    "table":"ContractOrder",
+    "type":"select",
+    "tag":"by_status",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "account":"{{i_account_id}}",
+      "status":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/cast",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[{"::":"sql/arg","name":"{{i_status}}"}]
+          },
+            {
+            "::":"sql/defenum",
+            "schema":"core/application",
+            "name":"EnumOrderStatus"
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-by-prospect [36] 
+var contract_order_by_prospect = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"},
+    {"symbol":"i_status","type":"jsonb"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_by_prospect",
+  "flags":{"personal":true},
+  "view":{
+    "table":"ContractOrder",
+    "type":"select",
+    "tag":"by_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "book":{"prospect":"{{i_prospect_id}}"},
+      "account":"{{i_account_id}}"
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-by-managed-prospect [36] 
+var contract_order_by_managed_prospect = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"},
+    {"symbol":"i_start_frame","type":"bigint"},
+    {"symbol":"i_end_frame","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_by_managed_prospect",
+  "flags":{"personal":true},
+  "view":{
+    "table":"ContractOrder",
+    "type":"select",
+    "tag":"by_managed_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "book":{"prospect":"{{i_prospect_id}}"},
+      "frame_created":["between","{{i_start_frame}}","and","{{i_end_frame}}"]
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_prospect_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"prediction/data-prospect",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_prospect_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-by-managed-prospect-bulk [36] 
+var contract_order_by_managed_prospect_bulk = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"},
+    {"symbol":"i_contract_order_ids","type":"jsonb"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_by_managed_prospect_bulk",
+  "flags":{"personal":true},
+  "view":{
+    "table":"ContractOrder",
+    "type":"select",
+    "tag":"by_managed_prospect_bulk",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "id":[
+        "in",
+        {
+        "::":"sql/select",
+        "args":[
+          {
+          "::":"sql/fn",
+          "name":"uuid",
+          "args":[
+            {
+            "::":"sql/fn",
+            "name":"jsonb_array_elements_text",
+            "args":[
+              {
+              "::":"sql/fn",
+              "name":"\"core/util\".as_array",
+              "args":[{"::":"sql/arg","name":"{{i_contract_order_ids}}"}]
+            }
+            ]
+          }
+          ]
+        }
+        ]
+      }
+      ],
+      "book":{"prospect":"{{i_prospect_id}}"}
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_prospect_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"prediction/data-prospect",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_prospect_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-summary-by-prospect [36] 
+var contract_order_summary_by_prospect = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_summary_by_prospect",
+  "flags":{"personal":true},
+  "view":{
+    "table":"ContractOrderSummary",
+    "type":"select",
+    "tag":"by_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"book":{"prospect":"{{i_prospect_id}}"}},
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_prospect_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"prediction/data-prospect",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_prospect_id}}"]
+    }
+    ],
+    "autos":[
+      {
+      "function":{
+        "input":[{"symbol":"i_prospect_id","type":"uuid"}],
+        "return":"jsonb",
+        "schema":"core/query-prediction",
+        "id":"update_order_summary",
+        "flags":{}
+      },
+      "args":["{{i_prospect_id}}"]
+    }
+    ]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-strike-by-prospect [36] 
+var contract_order_strike_by_prospect = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"},
+    {"symbol":"i_start_frame","type":"bigint"},
+    {"symbol":"i_end_frame","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_strike_by_prospect",
+  "flags":{"personal":true},
+  "view":{
+    "table":"ContractOrderStrike",
+    "type":"select",
+    "tag":"by_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "book":{"prospect":"{{i_prospect_id}}"},
+      "frame":["between","{{i_start_frame}}","and","{{i_end_frame}}"]
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_prospect_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"prediction/data-prospect",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_prospect_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-strike-summary-by-prospect [36] 
+var contract_order_strike_summary_by_prospect = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_strike_summary_by_prospect",
+  "flags":{"personal":true},
+  "view":{
+    "table":"ContractOrderStrikeSummary",
+    "type":"select",
+    "tag":"by_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"book":{"prospect":"{{i_prospect_id}}"}},
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_prospect_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"prediction/data-prospect",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_prospect_id}}"]
+    }
+    ],
+    "autos":[
+      {
+      "function":{
+        "input":[{"symbol":"i_prospect_id","type":"uuid"}],
+        "return":"jsonb",
+        "schema":"core/query-prediction",
+        "id":"update_order_strike_summary",
+        "flags":{}
+      },
+      "args":["{{i_prospect_id}}"]
+    }
+    ]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-log-by-published [36] 
+var contract_order_log_by_published = {
+  "input":[
+    {"symbol":"i_prospect_id","type":"uuid"},
+    {"symbol":"i_status","type":"jsonb"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_log_by_published",
+  "flags":{"public":true},
+  "view":{
+    "table":"ContractOrderLog",
+    "type":"select",
+    "tag":"by_published",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "book":{
+        "prospect":{
+          "id":"{{i_prospect_id}}",
+          "topic":{"publish":["in",[["book","log"]]]}
+        }
+      },
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-log-by-prospect [36] 
+var contract_order_log_by_prospect = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"},
+    {"symbol":"i_start_frame","type":"bigint"},
+    {"symbol":"i_end_frame","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_log_by_prospect",
+  "flags":{"personal":true},
+  "view":{
+    "table":"ContractOrderLog",
+    "type":"select",
+    "tag":"by_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "book":{"prospect":"{{i_prospect_id}}"},
+      "frame":["between","{{i_start_frame}}","and","{{i_end_frame}}"]
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_prospect_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"prediction/data-prospect",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_prospect_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/rake-entry-by-prospect [36] 
+var rake_entry_by_prospect = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"rake_entry_by_prospect",
+  "flags":{"personal":true},
+  "view":{
+    "table":"RakeEntry",
+    "type":"select",
+    "tag":"by_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "book":{"prospect":"{{i_prospect_id}}"},
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_prospect_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"prediction/data-prospect",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_prospect_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/rake-ledger-by-prospect [36] 
+var rake_ledger_by_prospect = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"rake_ledger_by_prospect",
+  "flags":{"personal":true},
+  "view":{
+    "table":"RakeLedger",
+    "type":"select",
+    "tag":"by_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"book":{"prospect":"{{i_prospect_id}}"}},
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_prospect_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"prediction/data-prospect",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_prospect_id}}"]
+    }
+    ],
+    "autos":[
+      {
+      "function":{
+        "input":[{"symbol":"i_prospect_id","type":"uuid"}],
+        "return":"jsonb",
+        "schema":"core/ledger-rake",
+        "id":"get_updated_prospect_ledger",
+        "flags":{}
+      },
+      "args":["{{i_prospect_id}}"]
+    }
+    ]
+  }
+};
+
+// statsapi.list.view-topic/contract-ledger-entry-by-prospect [36] 
+var contract_ledger_entry_by_prospect = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_ledger_entry_by_prospect",
+  "flags":{"personal":true},
+  "view":{
+    "table":"ContractLedgerEntry",
+    "type":"select",
+    "tag":"by_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "book":{"prospect":"{{i_prospect_id}}"},
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_prospect_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"prediction/data-prospect",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_prospect_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-ledger-by-prospect [36] 
+var contract_ledger_by_prospect = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_ledger_by_prospect",
+  "flags":{"personal":true},
+  "view":{
+    "table":"ContractLedger",
+    "type":"select",
+    "tag":"by_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"book":{"prospect":"{{i_prospect_id}}"}},
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_prospect_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"prediction/data-prospect",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_prospect_id}}"]
+    }
+    ],
+    "autos":[
+      {
+      "function":{
+        "input":[{"symbol":"i_prospect_id","type":"uuid"}],
+        "return":"jsonb",
+        "schema":"core/ledger-contract",
+        "id":"get_updated_ledger",
+        "flags":{}
+      },
+      "args":["{{i_prospect_id}}"]
+    }
+    ]
+  }
+};
+
+// statsapi.list.view-topic/stake-ledger-entry-by-prospect [36] 
+var stake_ledger_entry_by_prospect = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"},
+    {"symbol":"i_start_time","type":"bigint"},
+    {"symbol":"i_end_time","type":"bigint"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"stake_ledger_entry_by_prospect",
+  "flags":{"personal":true},
+  "view":{
+    "table":"StakeLedgerEntry",
+    "type":"select",
+    "tag":"by_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "book":{"prospect":"{{i_prospect_id}}"},
+      "time_created":["between","{{i_start_time}}","and","{{i_end_time}}"]
+    },
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_prospect_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"prediction/data-prospect",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_prospect_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/stake-ledger-by-topic-bulk [36] 
+var stake_ledger_by_topic_bulk = {
+  "input":[{"symbol":"i_topic_ids","type":"jsonb"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"stake_ledger_by_topic_bulk",
+  "flags":{"public":true},
+  "view":{
+    "table":"StakeLedger",
+    "type":"select",
+    "tag":"by_topic_bulk",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "book":{
+        "prospect":{
+          "topic":[
+            "in",
+            {
+            "::":"sql/select",
+            "args":[
+              {
+              "::":"sql/fn",
+              "name":"uuid",
+              "args":[
+                {
+                "::":"sql/fn",
+                "name":"jsonb_array_elements_text",
+                "args":[
+                  {
+                  "::":"sql/fn",
+                  "name":"\"core/util\".as_array",
+                  "args":[{"::":"sql/arg","name":"{{i_topic_ids}}"}]
+                }
+                ]
+              }
+              ]
+            }
+            ]
+          }
+          ]
+        }
+      }
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/stake-ledger-by-topic [36] 
+var stake_ledger_by_topic = {
+  "input":[{"symbol":"i_topic_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"stake_ledger_by_topic",
+  "flags":{"public":true},
+  "view":{
+    "table":"StakeLedger",
+    "type":"select",
+    "tag":"by_topic",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"book":{"prospect":{"topic":"{{i_topic_id}}"}}},
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/stake-ledger-by-prospect [36] 
+var stake_ledger_by_prospect = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"stake_ledger_by_prospect",
+  "flags":{"personal":true},
+  "view":{
+    "table":"StakeLedger",
+    "type":"select",
+    "tag":"by_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{"book":{"prospect":"{{i_prospect_id}}"}},
+    "guards":[
+      {
+      "function":{
+        "input":[
+          {"symbol":"i_account_id","type":"uuid"},
+          {"symbol":"i_prospect_id","type":"uuid"}
+        ],
+        "return":"boolean",
+        "schema":"prediction/data-prospect",
+        "id":"assert_is_admin",
+        "flags":{}
+      },
+      "args":["{{i_account_id}}","{{i_prospect_id}}"]
+    }
+    ],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/tx-stake-by-prospect [36] 
+var tx_stake_by_prospect = {
+  "input":[
+    {"symbol":"i_account_id","type":"uuid"},
+    {"symbol":"i_prospect_id","type":"uuid"}
+  ],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"tx_stake_by_prospect",
+  "flags":{"personal":true},
+  "view":{
+    "table":"TxStake",
+    "type":"select",
+    "tag":"by_prospect",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":{
+      "stake":{
+        "portfolio":{"owner":"{{i_account_id}}"},
+        "book":{"prospect":"{{i_prospect_id}}"}
+      }
+    },
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-default [41] 
+var contract_default = {
+  "input":[{"symbol":"i_log_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_default",
+  "flags":{},
+  "view":{
+    "table":"Contract",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[["pair",["*/standard"]],"*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-with-payout [41] 
+var contract_with_payout = {
+  "input":[{"symbol":"i_log_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_with_payout",
+  "flags":{},
+  "view":{
+    "table":"Contract",
+    "type":"return",
+    "tag":"with_payout",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      ["pair",["*/standard"]],
+      "*/standard",
+      ["payout",["*/standard"]]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/tx-contract-default [41] 
+var tx_contract_default = {
+  "input":[{"symbol":"i_tx_contract_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"tx_contract_default",
+  "flags":{},
+  "view":{
+    "table":"TxContract",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-pair-with-owner [41] 
+var contract_pair_with_owner = {
+  "input":[{"symbol":"i_tx_contract_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_pair_with_owner",
+  "flags":{},
+  "view":{
+    "table":"ContractPair",
+    "type":"return",
+    "tag":"with_owner",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      [
+      "contracts",
+      [
+      ["contract_orders",{"status":"active"},["*/standard"]],
+      "*/standard",
+      ["payout",["*/standard"]]
+    ]
+    ],
+      "*/standard",
+      [
+      "portfolio",
+      [
+      "*/standard",
+      ["owner",["nickname","id",["profile",["id","picture"]]]]
+    ]
+    ]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-pair-default [41] 
+var contract_pair_default = {
+  "input":[{"symbol":"i_tx_contract_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_pair_default",
+  "flags":{},
+  "view":{
+    "table":"ContractPair",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      [
+      "contracts",
+      [
+      ["contract_orders",{"status":"active"},["*/standard"]],
+      "*/standard",
+      ["payout",["*/standard"]]
+    ]
+    ],
+      "*/standard"
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-pair-summary-default [41] 
+var contract_pair_summary_default = {
+  "input":[{"symbol":"i_summary_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_pair_summary_default",
+  "flags":{},
+  "view":{
+    "table":"ContractPairSummary",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/stake-default [41] 
+var stake_default = {
+  "input":[{"symbol":"i_stake_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"stake_default",
+  "flags":{},
+  "view":{
+    "table":"Stake",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard",["payout",["*/standard"]]],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/stake-with-owner [41] 
+var stake_with_owner = {
+  "input":[{"symbol":"i_stake_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"stake_with_owner",
+  "flags":{},
+  "view":{
+    "table":"Stake",
+    "type":"return",
+    "tag":"with_owner",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      "*/standard",
+      [
+      "portfolio",
+      [
+      "*/standard",
+      ["owner",["nickname","id",["profile",["id","picture"]]]]
+    ]
+    ],
+      ["payout",["*/standard"]]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/stake-summary-default [41] 
+var stake_summary_default = {
+  "input":[{"symbol":"i_summary_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"stake_summary_default",
+  "flags":{},
+  "view":{
+    "table":"StakeSummary",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-log-summary-default [41] 
+var contract_order_log_summary_default = {
+  "input":[{"symbol":"i_summary_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_log_summary_default",
+  "flags":{},
+  "view":{
+    "table":"ContractOrderLogSummary",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-default [41] 
+var contract_order_default = {
+  "input":[{"symbol":"i_contract_order_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_default",
+  "flags":{},
+  "view":{
+    "table":"ContractOrder",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-with-owner [41] 
+var contract_order_with_owner = {
+  "input":[{"symbol":"i_contract_order_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_with_owner",
+  "flags":{},
+  "view":{
+    "table":"ContractOrder",
+    "type":"return",
+    "tag":"with_owner",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      "*/standard",
+      [
+      "account",
+      [
+      ["profile",["last_name","first_name","id","picture"]],
+      "nickname",
+      "id"
+    ]
+    ]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-detail [41] 
+var contract_order_detail = {
+  "input":[{"symbol":"i_contract_order_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_detail",
+  "flags":{},
+  "view":{
+    "table":"ContractOrder",
+    "type":"return",
+    "tag":"detail",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      "*/standard",
+      [
+      "hold",
+      [
+      ["tx_unhold_contract",["*/standard"]],
+      ["tx_rake",["*/standard"]],
+      "*/standard",
+      ["tx_unhold_asset",["*/standard"]],
+      ["tx_hold_contract",["*/standard"]],
+      ["tx_hold_asset",["*/standard"]]
+    ]
+    ]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/tx-contract-order-default [41] 
+var tx_contract_order_default = {
+  "input":[{"symbol":"i_tx_contract_order_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"tx_contract_order_default",
+  "flags":{},
+  "view":{
+    "table":"TxContractOrder",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-strike-history [41] 
+var contract_order_strike_history = {
+  "input":[{"symbol":"book_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_strike_history",
+  "flags":{},
+  "view":{
+    "table":"ContractOrder",
+    "type":"return",
+    "tag":"strike_history",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      ["bid_strikes","*/standard"],
+      ["ask_strikes","*/standard"],
+      "*/standard"
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-summary-default [41] 
+var contract_order_summary_default = {
+  "input":[{"symbol":"i_summary_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_summary_default",
+  "flags":{},
+  "view":{
+    "table":"ContractOrderSummary",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-strike-default [41] 
+var contract_order_strike_default = {
+  "input":[{"symbol":"i_strike_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_strike_default",
+  "flags":{},
+  "view":{
+    "table":"ContractOrderStrike",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-strike-summary-default [41] 
+var contract_order_strike_summary_default = {
+  "input":[{"symbol":"i_summary_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_strike_summary_default",
+  "flags":{},
+  "view":{
+    "table":"ContractOrderStrikeSummary",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-log-default [41] 
+var contract_order_log_default = {
+  "input":[{"symbol":"i_contract_order_log_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_log_default",
+  "flags":{},
+  "view":{
+    "table":"ContractOrderLog",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard",["order",["*/info"]]],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-order-log-order [41] 
+var contract_order_log_order = {
+  "input":[{"symbol":"i_contract_order_log_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_order_log_order",
+  "flags":{},
+  "view":{
+    "table":"ContractOrderLog",
+    "type":"return",
+    "tag":"order",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      "frame",
+      "time_created",
+      ["order",["amount","trade","side","position"]],
+      "id",
+      "seqtotal",
+      "action"
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/rake-entry-default-contract [41] 
+var rake_entry_default_contract = {
+  "input":[{"symbol":"i_entry_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"rake_entry_default_contract",
+  "flags":{},
+  "view":{
+    "table":"RakeEntry",
+    "type":"return",
+    "tag":"default_contract",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[
+      ["tx_contract_order_holds",["*/default",["order",["*/info"]]]],
+      ["stake_payouts",["*/default",["stake",["*/info"]]]],
+      "*/standard",
+      ["contract_payouts",[["contract",["*/info"]],"*/default"]]
+    ],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/rake-ledger-default [41] 
+var rake_ledger_default = {
+  "input":[{"symbol":"i_ledger_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"rake_ledger_default",
+  "flags":{},
+  "view":{
+    "table":"RakeLedger",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-ledger-entry-default [41] 
+var contract_ledger_entry_default = {
+  "input":[{"symbol":"i_entry_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_ledger_entry_default",
+  "flags":{},
+  "view":{
+    "table":"ContractLedgerEntry",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":[["strike",["*/default"]],"*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/contract-ledger-default [41] 
+var contract_ledger_default = {
+  "input":[{"symbol":"i_ledger_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"contract_ledger_default",
+  "flags":{},
+  "view":{
+    "table":"ContractLedger",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/stake-ledger-entry-default [41] 
+var stake_ledger_entry_default = {
+  "input":[{"symbol":"i_entry_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"stake_ledger_entry_default",
+  "flags":{},
+  "view":{
+    "table":"StakeLedgerEntry",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/stake-ledger-default [41] 
+var stake_ledger_default = {
+  "input":[{"symbol":"i_ledger_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"stake_ledger_default",
+  "flags":{},
+  "view":{
+    "table":"StakeLedger",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/tx-stake-default [41] 
+var tx_stake_default = {
+  "input":[{"symbol":"i_tx_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"tx_stake_default",
+  "flags":{},
+  "view":{
+    "table":"TxStake",
+    "type":"return",
+    "tag":"default",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard"],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/tx-stake-with-asset [41] 
+var tx_stake_with_asset = {
+  "input":[{"symbol":"i_tx_id","type":"uuid"}],
+  "return":"jsonb",
+  "schema":"core/query-prediction",
+  "id":"tx_stake_with_asset",
+  "flags":{},
+  "view":{
+    "table":"TxStake",
+    "type":"return",
+    "tag":"with_asset",
+    "access":{"query":null,"roles":{},"relation":null,"symbol":null},
+    "query":["*/standard",["tx_asset",["*/standard"]]],
+    "guards":[],
+    "autos":[]
+  }
+};
+
+// statsapi.list.view-topic/make-views [44] 
+function make_views(){
+  return ut.collect_views([
+    topic_by_id_admin,
+    topic_active,
+    topic_completed,
+    topic_get_public_name,
+    topic_by_organisation_system,
+    topic_by_organisation_admin,
+    topic_by_room_admin,
+    topic_all_cash_admin,
+    topic_all_public_cash,
+    topic_by_organisation_name_active,
+    topic_by_organisation_name_completed,
+    topic_by_playable_active,
+    topic_by_playable_completed,
+    tx_topic_status_by_topic,
+    starred_by_topic,
+    starred_by_prospect,
+    starred_entry_by_topic,
+    starred_entry_by_prospect,
+    topic_default,
+    topic_standard,
+    topic_full,
+    topic_full_display,
+    tx_topic_status_default,
+    starred_default,
+    starred_entry_default,
+    prospect_by_id_admin,
+    prospect_all_public_cash,
+    prospect_get_public_cash,
+    prospect_get_public_name,
+    prospect_active,
+    prospect_completed,
+    tx_prospect_status_by_prospect,
+    prospect_default,
+    prospect_full,
+    prospect_full_display,
+    tx_prospect_status_default,
+    contract_active,
+    contract_active_book,
+    tx_contract_for,
+    contract_by_status,
+    contract_pair_by_managed_prospect,
+    contract_pair_summary_by_prospect,
+    contract_pair_by_active,
+    contract_pair_by_active_room,
+    contract_pair_by_complete_room,
+    stake_by_status,
+    stake_by_prospect,
+    stake_by_managed_prospect,
+    stake_summary_by_prospect,
+    stake_by_active,
+    stake_by_active_room,
+    stake_by_complete_room,
+    contract_order_log_summary_by_prospect,
+    contract_order_active,
+    contract_order_active_book,
+    tx_contract_order_for,
+    tx_contract_order_for_prospect,
+    contract_order_by_published,
+    contract_order_by_published_bulk,
+    contract_order_by_status,
+    contract_order_by_prospect,
+    contract_order_by_managed_prospect,
+    contract_order_by_managed_prospect_bulk,
+    contract_order_summary_by_prospect,
+    contract_order_strike_by_prospect,
+    contract_order_strike_summary_by_prospect,
+    contract_order_log_by_published,
+    contract_order_log_by_prospect,
+    rake_entry_by_prospect,
+    rake_ledger_by_prospect,
+    contract_ledger_entry_by_prospect,
+    contract_ledger_by_prospect,
+    stake_ledger_entry_by_prospect,
+    stake_ledger_by_topic_bulk,
+    stake_ledger_by_topic,
+    stake_ledger_by_prospect,
+    tx_stake_by_prospect,
+    contract_default,
+    contract_with_payout,
+    tx_contract_default,
+    contract_pair_with_owner,
+    contract_pair_default,
+    contract_pair_summary_default,
+    stake_default,
+    stake_with_owner,
+    stake_summary_default,
+    contract_order_log_summary_default,
+    contract_order_default,
+    contract_order_with_owner,
+    contract_order_detail,
+    tx_contract_order_default,
+    contract_order_strike_history,
+    contract_order_summary_default,
+    contract_order_strike_default,
+    contract_order_strike_summary_default,
+    contract_order_log_default,
+    contract_order_log_order,
+    rake_entry_default_contract,
+    rake_ledger_default,
+    contract_ledger_entry_default,
+    contract_ledger_default,
+    stake_ledger_entry_default,
+    stake_ledger_default,
+    tx_stake_default,
+    tx_stake_with_asset
+  ]);
+}
+
+var MODULE = {
+  "topic_by_id_admin":topic_by_id_admin,
+  "topic_active":topic_active,
+  "topic_completed":topic_completed,
+  "topic_get_public_name":topic_get_public_name,
+  "topic_by_organisation_system":topic_by_organisation_system,
+  "topic_by_organisation_admin":topic_by_organisation_admin,
+  "topic_by_room_admin":topic_by_room_admin,
+  "topic_all_cash_admin":topic_all_cash_admin,
+  "topic_all_public_cash":topic_all_public_cash,
+  "topic_by_organisation_name_active":topic_by_organisation_name_active,
+  "topic_by_organisation_name_completed":topic_by_organisation_name_completed,
+  "topic_by_playable_active":topic_by_playable_active,
+  "topic_by_playable_completed":topic_by_playable_completed,
+  "tx_topic_status_by_topic":tx_topic_status_by_topic,
+  "starred_by_topic":starred_by_topic,
+  "starred_by_prospect":starred_by_prospect,
+  "starred_entry_by_topic":starred_entry_by_topic,
+  "starred_entry_by_prospect":starred_entry_by_prospect,
+  "topic_default":topic_default,
+  "topic_standard":topic_standard,
+  "topic_full":topic_full,
+  "topic_full_display":topic_full_display,
+  "tx_topic_status_default":tx_topic_status_default,
+  "starred_default":starred_default,
+  "starred_entry_default":starred_entry_default,
+  "prospect_by_id_admin":prospect_by_id_admin,
+  "prospect_all_public_cash":prospect_all_public_cash,
+  "prospect_get_public_cash":prospect_get_public_cash,
+  "prospect_get_public_name":prospect_get_public_name,
+  "prospect_active":prospect_active,
+  "prospect_completed":prospect_completed,
+  "tx_prospect_status_by_prospect":tx_prospect_status_by_prospect,
+  "prospect_default":prospect_default,
+  "prospect_full":prospect_full,
+  "prospect_full_display":prospect_full_display,
+  "tx_prospect_status_default":tx_prospect_status_default,
+  "contract_active":contract_active,
+  "contract_active_book":contract_active_book,
+  "tx_contract_for":tx_contract_for,
+  "contract_by_status":contract_by_status,
+  "contract_pair_by_managed_prospect":contract_pair_by_managed_prospect,
+  "contract_pair_summary_by_prospect":contract_pair_summary_by_prospect,
+  "contract_pair_by_active":contract_pair_by_active,
+  "contract_pair_by_active_room":contract_pair_by_active_room,
+  "contract_pair_by_complete_room":contract_pair_by_complete_room,
+  "stake_by_status":stake_by_status,
+  "stake_by_prospect":stake_by_prospect,
+  "stake_by_managed_prospect":stake_by_managed_prospect,
+  "stake_summary_by_prospect":stake_summary_by_prospect,
+  "stake_by_active":stake_by_active,
+  "stake_by_active_room":stake_by_active_room,
+  "stake_by_complete_room":stake_by_complete_room,
+  "contract_order_log_summary_by_prospect":contract_order_log_summary_by_prospect,
+  "contract_order_active":contract_order_active,
+  "contract_order_active_book":contract_order_active_book,
+  "tx_contract_order_for":tx_contract_order_for,
+  "tx_contract_order_for_prospect":tx_contract_order_for_prospect,
+  "contract_order_by_published":contract_order_by_published,
+  "contract_order_by_published_bulk":contract_order_by_published_bulk,
+  "contract_order_by_status":contract_order_by_status,
+  "contract_order_by_prospect":contract_order_by_prospect,
+  "contract_order_by_managed_prospect":contract_order_by_managed_prospect,
+  "contract_order_by_managed_prospect_bulk":contract_order_by_managed_prospect_bulk,
+  "contract_order_summary_by_prospect":contract_order_summary_by_prospect,
+  "contract_order_strike_by_prospect":contract_order_strike_by_prospect,
+  "contract_order_strike_summary_by_prospect":contract_order_strike_summary_by_prospect,
+  "contract_order_log_by_published":contract_order_log_by_published,
+  "contract_order_log_by_prospect":contract_order_log_by_prospect,
+  "rake_entry_by_prospect":rake_entry_by_prospect,
+  "rake_ledger_by_prospect":rake_ledger_by_prospect,
+  "contract_ledger_entry_by_prospect":contract_ledger_entry_by_prospect,
+  "contract_ledger_by_prospect":contract_ledger_by_prospect,
+  "stake_ledger_entry_by_prospect":stake_ledger_entry_by_prospect,
+  "stake_ledger_by_topic_bulk":stake_ledger_by_topic_bulk,
+  "stake_ledger_by_topic":stake_ledger_by_topic,
+  "stake_ledger_by_prospect":stake_ledger_by_prospect,
+  "tx_stake_by_prospect":tx_stake_by_prospect,
+  "contract_default":contract_default,
+  "contract_with_payout":contract_with_payout,
+  "tx_contract_default":tx_contract_default,
+  "contract_pair_with_owner":contract_pair_with_owner,
+  "contract_pair_default":contract_pair_default,
+  "contract_pair_summary_default":contract_pair_summary_default,
+  "stake_default":stake_default,
+  "stake_with_owner":stake_with_owner,
+  "stake_summary_default":stake_summary_default,
+  "contract_order_log_summary_default":contract_order_log_summary_default,
+  "contract_order_default":contract_order_default,
+  "contract_order_with_owner":contract_order_with_owner,
+  "contract_order_detail":contract_order_detail,
+  "tx_contract_order_default":tx_contract_order_default,
+  "contract_order_strike_history":contract_order_strike_history,
+  "contract_order_summary_default":contract_order_summary_default,
+  "contract_order_strike_default":contract_order_strike_default,
+  "contract_order_strike_summary_default":contract_order_strike_summary_default,
+  "contract_order_log_default":contract_order_log_default,
+  "contract_order_log_order":contract_order_log_order,
+  "rake_entry_default_contract":rake_entry_default_contract,
+  "rake_ledger_default":rake_ledger_default,
+  "contract_ledger_entry_default":contract_ledger_entry_default,
+  "contract_ledger_default":contract_ledger_default,
+  "stake_ledger_entry_default":stake_ledger_entry_default,
+  "stake_ledger_default":stake_ledger_default,
+  "tx_stake_default":tx_stake_default,
+  "tx_stake_with_asset":tx_stake_with_asset,
+  "make_views":make_views
+};
+
+module.exports = MODULE

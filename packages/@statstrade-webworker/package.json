@@ -1,0 +1,20 @@
+{
+  "name": "@statstrade/client",
+  "version": "0.0.6",
+  "private": false,
+  "main": "./src/main.js",
+  "exports": {
+      ".": "./src/main.js"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  },
+  "dependencies": {
+    "@xtalk/lang": "*",
+    "@xtalk/db": "*",
+    "@statstrade/api": "*",
+  }
+}
