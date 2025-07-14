@@ -1,5 +1,5 @@
 {
-  "name": "@statstrade/client",
+  "name": "@statstrade/webworker",
   "version": "0.0.6",
   "private": false,
   "main": "./src/main.js",
@@ -15,6 +15,6 @@
   "dependencies": {
     "@xtalk/lang": "*",
     "@xtalk/db": "*",
-    "@statstrade/api": "*",
+    "@statstrade/api": "*"
   }
 }

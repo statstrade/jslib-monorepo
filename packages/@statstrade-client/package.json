@@ -12,7 +12,7 @@
       "./user-api-meta": "./src/user-api-meta.js",
       "./user-api": "./src/user-api.js",
       "./user-common": "./src/user-common.js",
-      "./user-event": "./src/user-event.js",
+      "./user-event": "./src/user-event.js"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0"
@@ -23,6 +23,6 @@
   "dependencies": {
     "@xtalk/lang": "*",
     "@xtalk/db": "*",
-    "@statstrade/api": "*",
+    "@statstrade/api": "*"
   }
 }
